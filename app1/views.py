@@ -9,7 +9,8 @@ from django.http import HttpResponse, HttpResponseNotFound
 from pyexpat.errors import messages
 from django.contrib import messages
 from app1.models import Categorie, Responsabilite, Materiel, Mouvement, Client, LigneDeCommande, Commande, Notification, \
-    Installation, AffectationUtilisateur, PreparerCommande, CoursierCommande, ClienCommandeAvis, UserInterventino
+    Installation, AffectationUtilisateur, PreparerCommande, CoursierCommande, ClienCommandeAvis, UserInterventino, \
+    fichier_upload
 from django.shortcuts import render, redirect, get_object_or_404
 from app1.models import CustomUser
 from random import choice
@@ -35,12 +36,9 @@ from reportlab.lib.pagesizes import letter
 from reportlab.pdfgen import canvas
 from reportlab.lib.utils import ImageReader
 from django.http import FileResponse
-def test():
-    with connection.cursor() as cursor:
-        cursor.execute("select max(id) from app1_userinterventino")
-        maxx=cursor.fetchone()[0]
-    return maxx
-max=test()
+from django.http import FileResponse, Http404
+import os
+
 
 def welcomeview(request):
     return render(request,"app1/acceuille.html")
@@ -84,6 +82,10 @@ def admin_dashboard(request):
     debut_mois = today.replace(day=1)
     mats=Materiel.objects.all()
     somme=0
+    nombre_telechargement=fichier_upload.objects.get(id=1).numero
+    print(nombre_telechargement)
+    f1=UserInterventino.objects.all()
+    total_upload=f1.count()
     for mat in mats:
         somme=mat.quantite_stock+somme
     print(somme)
@@ -98,6 +100,8 @@ def admin_dashboard(request):
         "somme": somme,
         "total": total,
         "en_attente": en_attente,
+        "nombre_telechargement":nombre_telechargement,
+        "total_upload": total_upload,
     })
 
 @login_required
@@ -1056,9 +1060,10 @@ def avis_client_sur_commande(request):
 
 @login_required
 def fichier_intervention(request):
-    global max
-    max+=1
-    # Création du PDF en mémoire
+    total_telechargement=fichier_upload.objects.get(id=1)
+    total_telechargement.numero+=1
+    print(total_telechargement)
+    total_telechargement.save()
     buf = io.BytesIO()
     c = canvas.Canvas(buf, pagesize=letter)
     width, height = letter
@@ -1075,7 +1080,7 @@ def fichier_intervention(request):
     c.setFont("Helvetica-Bold", 16)
     c.drawCentredString(width / 2, y + 15, "MUNISYS MAROC")
     c.setFont("Helvetica", 12)
-    c.drawCentredString(width / 2, y + 35, f"FICHE D’INTERVENTION N°{max}")
+    c.drawCentredString(width / 2, y + 35, f"FICHE D’INTERVENTION N°{total_telechargement.numero}")
     y -= 70
 
     # ===== CHAMPS À REMPLIR =====
@@ -1141,4 +1146,17 @@ def uploader_fiche_intervention(request):
                 return HttpResponse("ce fichier ne respecte pas les normes ")
     return render(request,"app1/uploader-fiche_intervention.html")
 
-
+@login_required
+def historique_intervention(request):
+    if 'telecharger' in request.GET:
+        idd=request.GET.get('telecharger')
+        print(idd)
+        intervention=UserInterventino.objects.get(id=idd)
+        print(intervention.fichier)
+        fichier_path = os.path.join("media",f"{intervention.fichier}")
+        print(fichier_path)
+        if not os.path.exists(fichier_path):
+            raise Http404("Fichier introuvable.")
+        return FileResponse(open(fichier_path, 'rb'), as_attachment=True, filename=f"{intervention.fichier}")
+    interventions=UserInterventino.objects.all()
+    return render(request,"app1/admin_visualier_intervention.html",{"interventions":interventions})

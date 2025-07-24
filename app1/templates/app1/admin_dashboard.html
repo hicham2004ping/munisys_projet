@@ -171,6 +171,9 @@
         <li class="nav-item">
             <a class="nav-link" data-bs-toggle="tab" href="#orders">Commandes</a>
         </li>
+        <li class="nav-item">
+            <a class="nav-link" data-bs-toggle="tab" href="#interventions">Interventions</a>
+        </li>
     </ul>
 
     <div class="tab-content">
@@ -252,23 +255,30 @@
                 </div>
             </div>
         </div>
-    </div>
 
-    <div class="tab-pane fade" id="orders">
+        <!-- INTERVENTIONS -->
+        <div class="tab-pane fade" id="interventions">
             <h2 class="section-title">Gestion des interventions</h2>
             <div class="row">
                 <div class="col-lg-8">
                     <div class="card p-3">
                         <div class="card-body">
-                            <a href="" class="btn btn-outline-success btn-action"><i class="fas fa-history"></i> visualiser les interventions</a>
+                            <a href="{% url 'historique_intervention' %}" class="btn btn-outline-success btn-action">
+                                <i class="fas fa-wrench"></i> Visualiser les interventions
+                            </a>
                         </div>
                     </div>
                 </div>
                 <div class="col-lg-4">
                     <div class="stat-card">
-                        <i class="fas fa-box-open fa-2x mb-2"></i>
-                        <h3></h3>
-                        <p>interventions au total</p>
+                        <i class="fas fa-tools fa-2x mb-2"></i>
+                        <h3>{{ total_upload }}</h3>
+                        <p>Interventions uploader au total</p>
+                    </div>
+                    <div class="stat-card">
+                        <i class="fas fa-tools fa-2x mb-2"></i>
+                        <h3>{{ nombre_telechargement }}</h3>
+                        <p>Interventions telecharger au total</p>
                     </div>
                 </div>
             </div>

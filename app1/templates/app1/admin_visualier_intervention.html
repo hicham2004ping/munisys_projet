@@ -1,0 +1,26 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Interventions</title>
+</head>
+<body>
+        <h3>Voici les interventions</h3>
+        {% if interventions %}
+    {% for i in interventions %}
+        {{ i.date_ajout }}
+        <br>
+        {{ i.user.role }}
+        <br>
+        {{ i.user.username }}
+        <br>
+        {{ i.user.email }}
+        <br>
+        <a href="?telecharger={{ i.id }}">Telecharger le fiche de l'intervention</a>
+        <br><br>
+    {% endfor %}
+            {% else %}
+            <h3>Aucune interventions a afficher</h3>
+    {% endif %}
+</body>
+</html>

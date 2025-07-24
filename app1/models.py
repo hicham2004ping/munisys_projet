@@ -98,3 +98,5 @@ class UserInterventino(models.Model):
     fichier=models.FileField(upload_to="fiche_d'intervention/",blank=True,null=True)
     date_ajout = models.DateTimeField(default=timezone.now)
 
+class fichier_upload(models.Model):
+    numero=models.IntegerField()

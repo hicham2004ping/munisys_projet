@@ -55,4 +55,5 @@ path('dashboard/client/recue-commande/<int:id>', views.telecharger_recue2, name=
 path('dashboard/commerciale/avis', views.avis_client_sur_commande, name='avis_client'),
 path('fichier-intervention', views.fichier_intervention, name='intervention'),
 path('uploader/fichier-intervention', views.uploader_fiche_intervention, name='uploader'),
+path('dashboard/admin/interventions', views.historique_intervention, name='historique_intervention'),
 ]
