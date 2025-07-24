@@ -3,6 +3,7 @@ from django.urls import path, include
 from app1 import views
 
 urlpatterns = [
+
 path('',views.welcomeview,name="acceuille"),
 path('login/', views.login_view, name="login"),
 path('dashboard/adminn/', views.admin_dashboard, name="adminn"),
