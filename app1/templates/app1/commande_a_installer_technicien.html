@@ -1,0 +1,23 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>A installer</title>
+</head>
+<body>  {% if commandes %}
+        {% for c in commandes %}
+            {{ c.id }}
+            <br>
+            {{ c.client.nom }}
+            <br>
+            {{ c.date_commande }}
+            <br>
+            {{ c.comerciale.username }}
+            <br>
+            <a href="?installer={{ c.id }}">Confirmer l'installation</a>
+        {% endfor %}
+        {% else %}
+            <h3>aucune commande a installer </h3>
+        {% endif %}
+</body>
+</html>

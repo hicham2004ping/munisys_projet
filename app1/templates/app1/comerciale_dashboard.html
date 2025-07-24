@@ -1,0 +1,151 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <title>Dashboard Commercial - Munisys</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet" />
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet" />
+    <style>
+        body {
+            background-image: url('https://www.groupe3architectes.com/wp-content/uploads/2020/06/1-18.webp');
+            background-size: cover;
+            background-position: center;
+            background-repeat: no-repeat;
+            background-attachment: fixed;
+            margin: 0;
+            font-family: 'Segoe UI', sans-serif;
+        }
+
+        body::before {
+            content: '';
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background-color: rgba(255, 255, 255, 0.85);
+            z-index: -1;
+        }
+
+        .navbar {
+            background-color: white;
+            padding: 1rem 2rem;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .navbar .brand a {
+            font-size: 1.5rem;
+            font-weight: bold;
+            color: #2c3e50;
+            text-decoration: none;
+        }
+
+        .navbar .actions a {
+            margin-left: 20px;
+            text-decoration: none;
+            color: #2c3e50;
+            font-size: 1.3rem;
+            transition: 0.3s;
+        }
+
+        .navbar .actions a:hover {
+            color: #3498db;
+        }
+
+        .container {
+            background: rgba(255, 255, 255, 0.95);
+            padding: 30px;
+            border-radius: 10px;
+            max-width: 800px;
+            margin: 80px auto;
+            box-shadow: 0 0 15px rgba(0,0,0,0.2);
+        }
+
+        h2 {
+            color: #0d6efd;
+            text-align: center;
+            margin-bottom: 30px;
+        }
+
+        .card {
+            border: none;
+            margin-bottom: 20px;
+        }
+
+        .card-header {
+            background-color: #0d6efd;
+            color: white;
+            font-weight: bold;
+            font-size: 1.1rem;
+        }
+
+        .btn-outline-primary,
+        .btn-outline-success {
+            transition: all 0.3s ease-in-out;
+        }
+
+        .btn-outline-primary:hover {
+            background-color: #0d6efd;
+            color: #fff;
+        }
+
+        .btn-outline-success:hover {
+            background-color: #198754;
+            color: #fff;
+        }
+    </style>
+</head>
+<body>
+
+    <!-- Barre de navigation -->
+    <div class="navbar">
+        <div class="brand"><a href="{% url 'comercial-dashboard' %}">Munisys</a></div>
+        <div class="actions">
+            <a href="{% url 'notifications_comerciale' %}" title="Notifications">
+                <i class="fas fa-bell"></i>
+            </a>
+            <a href="{% url 'logout' %}" title="Déconnexion">
+                <i class="fas fa-sign-out-alt"></i>
+            </a>
+        </div>
+    </div>
+
+    <!-- Contenu principal -->
+    <div class="container">
+        <h2>Bienvenue dans le Dashboard du Commercial</h2>
+
+        <div class="card">
+            <div class="card-header">Gestion des Commandes</div>
+            <div class="card-body">
+                <a href="{% url 'liste_commande_assinger' %}" class="btn btn-outline-primary w-100 mb-3">
+                    Commandes assignées
+                </a>
+                <a href="{% url 'historique_commande_passe' %}" class="btn btn-outline-primary w-100">
+                    Historique des commandes passées
+                </a>
+                    <br><br>
+                <a href="{% url 'commande_finsaliser' %}" class="btn btn-outline-primary w-100">
+                   Liste des commandes a finaliser
+                </a>
+                <br><br>
+                <a href="{% url 'avis_client' %}" class="btn btn-outline-primary w-100">
+                   Les avis des clients sur les commandes
+                </a>
+                <br><br>
+                <a href="{% url 'intervention' %}" class="btn btn-outline-primary w-100">
+                    Telecharger le fiche de l'intervention
+                </a>
+                <br><br>
+
+                <a href="{% url 'uploader' %}" class="btn btn-outline-primary w-100">
+                    Uploader le fiche de l'intervention
+                </a>
+
+            </div>
+        </div>
+    </div>
+</body>
+</html>

@@ -1,0 +1,143 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <title>Risque de Rupture de Stock - Munisys</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet">
+    <style>
+        :root {
+            --primary-color: #25658f;
+            --accent-color: #8f2565;
+            --bg-overlay: rgba(255, 255, 255, 0.9);
+            --shadow: 0 6px 16px rgba(0,0,0,0.15);
+        }
+
+        body {
+            background-image: url('https://www.amso.fr/wp-content/uploads/2022/09/amenagement_plateau_bureaux_paris13-18-scaled.jpg');
+            background-size: cover;
+            background-position: center;
+            background-attachment: fixed;
+            margin: 0;
+            font-family: 'Segoe UI', sans-serif;
+        }
+
+        body::before {
+            content: '';
+            position: fixed;
+            top: 0; left: 0;
+            width: 100%; height: 100%;
+            background-color: var(--bg-overlay);
+            z-index: -1;
+        }
+
+        .navbar {
+            background-color: var(--primary-color);
+            padding: 1rem 2rem;
+            box-shadow: var(--shadow);
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .navbar a {
+            color: white !important;
+            font-weight: 500;
+            text-decoration: none;
+        }
+
+        .navbar a:hover {
+            color: #ffe6f2 !important;
+        }
+
+        .container {
+            margin: 60px auto;
+            max-width: 1000px;
+            background: white;
+            padding: 30px;
+            border-radius: 12px;
+            box-shadow: var(--shadow);
+        }
+
+        h2 {
+            text-align: center;
+            color: var(--accent-color);
+            margin-bottom: 30px;
+        }
+
+        .produit {
+            margin-bottom: 25px;
+            padding: 15px;
+            border-radius: 8px;
+            display: flex;
+            align-items: center;
+            gap: 20px;
+            background: #f9f9f9;
+            border-left: 5px solid var(--primary-color);
+            transition: transform 0.2s ease;
+        }
+
+        .produit:hover {
+            transform: translateY(-3px);
+            background: #eef6fc;
+        }
+
+        .produit img {
+            max-width: 100px;
+            max-height: 100px;
+            border-radius: 6px;
+            object-fit: cover;
+            border: 1px solid #ccc;
+        }
+
+        .details {
+            flex-grow: 1;
+        }
+
+        .details p {
+            margin: 4px 0;
+            color: #333;
+            font-size: 15px;
+        }
+
+        .details strong {
+            color: var(--primary-color);
+        }
+
+        .text-muted {
+            font-style: italic;
+        }
+    </style>
+</head>
+<body>
+
+<!-- Barre de navigation -->
+<nav class="navbar">
+    <a class="navbar-brand fw-bold" href="{% url 'adminn' %}">Munisys</a>
+    <div>
+        <a href="{% url 'notification_admin' %}" class="me-4"><i class="fas fa-bell"></i> Notifications</a>
+        <a href="{% url 'logout' %}"><i class="fas fa-sign-out-alt"></i> Déconnexion</a>
+    </div>
+</nav>
+
+<!-- Contenu principal -->
+<div class="container">
+    <h2>Produits en Risque de Rupture de Stock</h2>
+
+    {% for produit in produits %}
+        <div class="produit">
+            <img src="/media/{{ produit.7 }}" alt="{{ produit.1 }}">
+            <div class="details">
+                <p><strong>Nom :</strong> {{ produit.1 }}</p>
+                <p><strong>Référence :</strong> {{ produit.0 }}</p>
+                <p><strong>Quantité en stock :</strong> {{ produit.3 }}</p>
+                <p><strong>Seuil minimum :</strong> {{ produit.5 }}</p>
+            </div>
+        </div>
+    {% empty %}
+        <p class="text-center text-muted">Aucun produit en risque actuellement.</p>
+    {% endfor %}
+</div>
+
+</body>
+</html>

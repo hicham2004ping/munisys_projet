@@ -1,0 +1,25 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>commande-afiniliser</title>
+</head>
+<body>
+    <h3>voici les commandes a finaliser</h3>
+    {% for c in commandes %}
+        {{ c.client.nom }}
+        <br>
+        {{ c.date_commande }}
+        <br>
+        {{ c.id }}
+        <br>
+        {{ c.client.telephone }}
+        <br>
+        {% if c.statut == 'installer' %}
+        <a href="?finaliser={{ c.id}}">Finaliser</a>
+            <br>
+        {% endif %}
+            <br>
+        {% endfor %}
+</body>
+</html>

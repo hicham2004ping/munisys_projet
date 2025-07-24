@@ -1,0 +1,18 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>uploader</title>
+</head>
+<body>
+    <h3>merci d'uploader le fiche d'intervention</h3>
+        <form method="post" enctype="multipart/form-data">
+            {% csrf_token %}
+            <label>Merci d'entrer votre fichier</label>
+            <br><br>
+            <input type="file" name="fichier" placeholder="entrer votre fichier">
+            <br><br>
+            <button type="submit">Enregistrer</button>
+        </form>
+</body>
+</html>

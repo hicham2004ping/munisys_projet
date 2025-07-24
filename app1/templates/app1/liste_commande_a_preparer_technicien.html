@@ -1,0 +1,34 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>a-preparer</title>
+</head>
+<body>
+    <h3>bienvenue sur la liste des commandes a traiter</h3>
+    {% if commandes %}
+    {% for commande in commandes %}
+        <div class="card mb-3">
+            <div class="card-header">
+                <strong>Commande ID :</strong> {{ commande.id }} <br>
+                <strong>Date :</strong> {{ commande.date_commande }}
+            </div>
+            <div class="card-body">
+                <h5>Matériels à installer :</h5>
+                <ul class="list-group">
+                    {% for ligne in commande.lignes.all %}
+                        <li class="list-group-item d-flex justify-content-between">
+                            {{ ligne.produit.nom }}
+                            <span>Quantité : {{ ligne.quantite }}</span>
+                        </li>
+                    {% endfor %}
+                </ul>
+            </div>
+        </div>
+    {% endfor %}
+{% else %}
+    <p>Aucune commande à traiter.</p>
+{% endif %}
+
+</body>
+</html>

@@ -1,0 +1,15 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>commander</title>
+</head>
+<body>
+    <form method="post">
+    <label>quantite</label>
+        {% csrf_token %}
+        <input name="qte" type="number" min="1" max="{{produit.quantite_stock}}" required>
+        <button type="submit">commander</button>
+    </form>
+</body>
+</html>

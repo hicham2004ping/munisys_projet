@@ -1,0 +1,139 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <title>Historique des Commandes - Munisys</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet">
+    <style>
+        :root {
+            --primary-color: #25658f;
+            --accent-color: #8f2565;
+            --shadow: 0 6px 16px rgba(0,0,0,0.12);
+        }
+
+        body {
+            font-family: 'Segoe UI', sans-serif;
+            background-image: url('https://www.groupe3architectes.com/wp-content/uploads/2020/06/1-18.webp');
+            background-size: cover;
+            background-attachment: fixed;
+            margin: 0;
+        }
+
+        body::before {
+            content: '';
+            position: fixed;
+            top: 0; left: 0;
+            width: 100%;
+            height: 100%;
+            background-color: rgba(255, 255, 255, 0.92);
+            z-index: -1;
+        }
+
+        .navbar {
+            background-color: var(--primary-color);
+            padding: 1rem 2rem;
+            box-shadow: var(--shadow);
+        }
+
+        .navbar a {
+            color: white !important;
+            font-weight: 500;
+            text-decoration: none;
+        }
+
+        .navbar a:hover {
+            color: #ffe6f2 !important;
+        }
+
+        .container {
+            max-width: 950px;
+            margin: 50px auto;
+            background: white;
+            padding: 30px;
+            border-radius: 10px;
+            box-shadow: var(--shadow);
+        }
+
+        h1 {
+            text-align: center;
+            color: var(--accent-color);
+            margin-bottom: 30px;
+        }
+
+        .commande-card {
+            background: #fdfdfd;
+            padding: 20px 25px;
+            margin-bottom: 20px;
+            border-left: 5px solid var(--primary-color);
+            border-radius: 8px;
+            transition: 0.2s;
+        }
+
+        .commande-card:hover {
+            background: #eef6fc;
+        }
+
+        .commande-card p,
+        .commande-card li {
+            margin: 6px 0;
+            color: #333;
+        }
+
+        .commande-card strong {
+            color: var(--primary-color);
+        }
+
+        .commande-card ul {
+            padding-left: 18px;
+            margin-top: 10px;
+        }
+
+        .commande-card ul li::marker {
+            color: var(--accent-color);
+        }
+
+        .no-data {
+            text-align: center;
+            font-style: italic;
+            color: #888;
+            font-size: 1.1em;
+        }
+    </style>
+</head>
+<body>
+
+<!-- Barre de navigation -->
+<nav class="navbar">
+    <a class="navbar-brand fw-bold" href="{% url 'adminn' %}">Munisys Admin</a>
+    <div class="ms-auto d-flex gap-4">
+        <a href="{% url 'notification_admin' %}"><i class="fas fa-bell"></i> Notifications</a>
+        <a href="{% url 'logout' %}"><i class="fas fa-sign-out-alt"></i> Déconnexion</a>
+    </div>
+</nav>
+
+<!-- Contenu principal -->
+<div class="container">
+    <h1>📦 Commandes Approuvées</h1>
+
+    {% if commandes_data %}
+        {% for data in commandes_data %}
+            <div class="commande-card">
+                <p><strong>🆔 ID de commande :</strong> {{ data.commande.id }}</p>
+                <p><strong>🧰 Technicien :</strong> {{ data.technicien }}</p>
+                <p><strong>💰 Total :</strong> {{ data.total }} dh</p>
+                <p><strong>📌 Statut :</strong> {{ data.commande.statut }}</p>
+                <ul>
+                    {% for ligne in data.lignes %}
+                        <li>{{ ligne.produit.nom }} — {{ ligne.quantite }} × {{ ligne.produit.prix }} dh</li>
+                    {% endfor %}
+                </ul>
+            </div>
+        {% endfor %}
+    {% else %}
+        <p class="no-data">Aucune commande approuvée trouvée.</p>
+    {% endif %}
+</div>
+
+</body>
+</html>
