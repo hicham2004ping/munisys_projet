@@ -1141,3 +1141,4 @@ def uploader_fiche_intervention(request):
                 return HttpResponse("ce fichier ne respecte pas les normes ")
     return render(request,"app1/uploader-fiche_intervention.html")
 
+
