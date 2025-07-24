@@ -2,7 +2,7 @@
 <html lang="fr">
 <head>
     <meta charset="UTF-8">
-    <title>Interventions - Munisys</title>
+    <title>Statistiques des interventions - Munisys</title>
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <style>
@@ -34,13 +34,36 @@
             z-index: -1;
         }
 
+        .navbar {
+            background-color: var(--light-overlay);
+            box-shadow: var(--shadow);
+        }
+
+        .navbar-brand {
+            color: var(--primary-color);
+            font-weight: bold;
+            font-size: 1.5rem;
+        }
+
+        .nav-utility a {
+            color: var(--primary-color);
+            font-weight: 500;
+            text-decoration: none;
+        }
+
+        .nav-utility a:hover {
+            color: var(--accent-color);
+        }
+
         .main-container {
             padding: 2rem;
             background-color: var(--light-overlay);
-            margin: 40px auto;
+            margin-top: 40px;
             border-radius: var(--border-radius);
             box-shadow: var(--shadow);
-            max-width: 900px;
+            max-width: 800px;
+            margin-left: auto;
+            margin-right: auto;
         }
 
         .section-title {
@@ -51,7 +74,7 @@
             margin-bottom: 2rem;
         }
 
-        .intervention-card {
+        .stat-card {
             background-color: white;
             border-radius: var(--border-radius);
             padding: 1.5rem;
@@ -59,22 +82,8 @@
             margin-bottom: 1.5rem;
         }
 
-        .btn-download {
-            display: inline-block;
-            padding: 8px 20px;
-            border-radius: 50px;
-            background-color: var(--primary-color);
-            color: white;
-            text-decoration: none;
-            transition: background-color 0.3s ease;
-        }
-
-        .btn-download:hover {
-            background-color: #1e4e6b;
-        }
-
-        h3, p {
-            margin-bottom: 0.5rem;
+        .stat-card p {
+            margin: 0;
         }
 
         .no-data {
@@ -86,21 +95,29 @@
 </head>
 <body>
 
-<div class="container main-container">
-    <h2 class="section-title"><i class="fas fa-tools"></i> Liste des interventions</h2>
-
-    {% if interventions %}
-        {% for i in interventions %}
-        <div class="intervention-card">
-            <p><strong>Date :</strong> {{ i.date_ajout }}</p>
-            <p><strong>Rôle :</strong> {{ i.user.role }}</p>
-            <p><strong>Nom d'utilisateur :</strong> {{ i.user.username }}</p>
-            <p><strong>Email :</strong> {{ i.user.email }}</p>
-            <a href="?telecharger={{ i.id }}" class="btn-download"><i class="fas fa-file-download"></i> Télécharger la fiche</a>
+<!-- Barre de navigation -->
+<nav class="navbar navbar-expand-lg">
+    <div class="container">
+        <a class="navbar-brand" href="{% url 'adminn' %}">Munisys Admin</a>
+        <div class="nav-utility ms-auto d-flex gap-3">
+            <a href="{% url 'notification_admin' %}"><i class="fas fa-bell"></i> Notifications</a>
+            <a href="{% url 'logout' %}"><i class="fas fa-sign-out-alt"></i> Déconnexion</a>
         </div>
+    </div>
+</nav>
+
+<div class="container main-container">
+    <h2 class="section-title"><i class="fas fa-chart-bar"></i> Interventions par utilisateur</h2>
+
+    {% if result %}
+        {% for r in result %}
+            <div class="stat-card">
+                <p><strong>Utilisateur :</strong> {{ r.0 }}</p>
+                <p><strong>Nombre d'interventions :</strong> {{ r.1 }}</p>
+            </div>
         {% endfor %}
     {% else %}
-        <h3 class="no-data">Aucune intervention à afficher</h3>
+        <h4 class="no-data">Aucune donnée disponible</h4>
     {% endif %}
 </div>
 

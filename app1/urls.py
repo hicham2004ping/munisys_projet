@@ -56,4 +56,6 @@ path('dashboard/commerciale/avis', views.avis_client_sur_commande, name='avis_cl
 path('fichier-intervention', views.fichier_intervention, name='intervention'),
 path('uploader/fichier-intervention', views.uploader_fiche_intervention, name='uploader'),
 path('dashboard/admin/interventions', views.historique_intervention, name='historique_intervention'),
+path('dashboard/admin/nombre-interventions', views.nombre_intervention_par_user, name='nombre_intervention_par_user'),
+
 ]

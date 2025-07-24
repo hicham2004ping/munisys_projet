@@ -39,7 +39,6 @@ from django.http import FileResponse
 from django.http import FileResponse, Http404
 import os
 
-
 def welcomeview(request):
     return render(request,"app1/acceuille.html")
 
@@ -1160,3 +1159,17 @@ def historique_intervention(request):
         return FileResponse(open(fichier_path, 'rb'), as_attachment=True, filename=f"{intervention.fichier}")
     interventions=UserInterventino.objects.all()
     return render(request,"app1/admin_visualier_intervention.html",{"interventions":interventions})
+
+@login_required
+def nombre_intervention_par_user(request):
+    with connection.cursor() as cursor:
+        cursor.execute("""
+                select app1_customuser.username nom ,count(*)
+                from app1_customuser,app1_userinterventino
+                WHERE
+                app1_customuser.id=app1_userinterventino.user_id
+                group by nom
+        """)
+        result = cursor.fetchall()
+    return render(request,"app1/nombe_fiche_intervention_par_user.html",{"result":result})
+
