@@ -85,7 +85,7 @@
 <!-- Navigation -->
 <nav class="navbar navbar-expand-lg">
     <div class="container-fluid px-4">
-        <a class="navbar-brand fw-bold" href="{% url 'technicien_dashboard' %}">Munisys </a>
+        <a class="navbar-brand fw-bold" href="{% url 'technicien_dashboard' %}">Munisys</a>
         <div class="ms-auto d-flex align-items-center gap-4">
             <a class="nav-link" href="{% url 'notification_admin' %}">
                 <i class="fas fa-bell"></i> Notifications
@@ -101,16 +101,41 @@
 <div class="container">
     <h2>Commandes à Traiter</h2>
 
-    {% if commandes %}
-
-        {% for c in commandes %}
+    {% if commandes_infos %}
+        {% for c in commandes_infos %}
             <div class="commande-card">
                 <p><strong>Client :</strong> {{ c.commande.client.nom }}</p>
                 <p><strong>Téléphone :</strong> {{ c.commande.client.telephone }}</p>
                 <p><strong>Date :</strong> {{ c.commande.date_commande|date:"d/m/Y H:i" }}</p>
                 <p><strong>ID de commande :</strong> {{ c.commande.id }}</p>
                 <p><strong>Statut :</strong> {{ c.commande.statut }}</p>
-                <a href="?preparer={{ c.commande.id }}">Preparer</a>
+
+                <!-- Barre de progression -->
+                <p><strong>Temps utilisé :</strong>
+                    {% if c.temps_utilise_pourcent != "N/A" %}
+                        {{ c.temps_utilise_pourcent }}%
+                        <div class="progress mt-2" style="height: 20px;">
+                            <div class="progress-bar"
+                                 role="progressbar"
+                                 style="width: {{ c.temps_utilise_pourcent }}%;
+                                        background-color:
+                                            {% if c.temps_utilise_pourcent > 80 %}
+                                                #dc3545
+                                            {% elif c.temps_utilise_pourcent > 50 %}
+                                                #ffc107
+                                            {% else %}
+                                                #198754
+                                            {% endif %};">
+                                {{ c.temps_utilise_pourcent }}%
+                            </div>
+                        </div>
+                    {% else %}
+                        Non disponible
+                    {% endif %}
+                </p>
+
+                <a href="?preparer={{ c.commande.id }}">Préparer</a>
+
                 <hr>
                 <p><strong>Produits commandés :</strong></p>
                 <ul>
@@ -125,13 +150,14 @@
     {% else %}
         <p class="no-data">Aucune commande à traiter pour le moment.</p>
     {% endif %}
-{% if messages %}
-<div class="container mt-4">
-    {% for message in messages %}
-        <div class="alert alert-{{ message.tags }}">{{ message }}</div>
-    {% endfor %}
-</div>
-{% endif %}
+
+    {% if messages %}
+        <div class="container mt-4">
+            {% for message in messages %}
+                <div class="alert alert-{{ message.tags }}">{{ message }}</div>
+            {% endfor %}
+        </div>
+    {% endif %}
 </div>
 
 </body>

@@ -845,38 +845,64 @@ def produit_en_rupture_de_stocke(request):
 
 @login_required
 def preparer_commande_technicien(request):
-        if "preparer" in request.GET:
-            id=request.GET.get("preparer")
-            commande=Commande.objects.get(id=id)
-            if commande.statut == "annuler":
-                messages.error(request, "Cette commande a été annulée par le client.")
-                return redirect("commande_preparer")
+    if "preparer" in request.GET:
+        id = request.GET.get("preparer")
+        commande = Commande.objects.get(id=id)
 
-            commande.statut="en_preparation"
-            commande.save()
-            coursier_assigner=get_suivant("coursier")
-            b=CoursierCommande.objects.create(Commande=commande,coursier=coursier_assigner)
-            lignes=commande.lignes.all()
-
-            for ligne in lignes:
-                    mv=Mouvement.objects.create(
-                    type="sortie",
-                    quantite=ligne.quantite,
-                    effectuer_par=request.user,
-                    materiel=ligne.produit,
-                    date=timezone.now(),
-                )
-                    ligne.produit.quantite_stock -= ligne.quantite
-                    ligne.produit.save()
+        if commande.statut == "annuler":
+            messages.error(request, "Cette commande a été annulée par le client.")
             return redirect("commande_preparer")
-        else:
-            technicien = CustomUser.objects.get(id=request.user.id)
-            commandes_assignées = PreparerCommande.objects.filter(
+
+        commande.statut = "en_preparation"
+        commande.save()
+
+        coursier_assigner = get_suivant("coursier")
+        CoursierCommande.objects.create(Commande=commande, coursier=coursier_assigner)
+
+        lignes = commande.lignes.all()
+        for ligne in lignes:
+            Mouvement.objects.create(
+                type="sortie",
+                quantite=ligne.quantite,
+                effectuer_par=request.user,
+                materiel=ligne.produit,
+                date=timezone.now(),
+            )
+            ligne.produit.quantite_stock -= ligne.quantite
+            ligne.produit.save()
+
+        return redirect("commande_preparer")
+
+    else:
+        technicien = CustomUser.objects.get(id=request.user.id)
+        commandes_assignées = PreparerCommande.objects.filter(
             technicien=technicien,
             commande__statut="valider"
         ).select_related("commande__client").prefetch_related("commande__lignes__produit")
-            return render(request, "app1/liste_commande_a_traiter.html", {
-            "commandes": commandes_assignées
+
+        commandes_infos = []
+
+        now = timezone.now()
+
+        for assignation in commandes_assignées:
+            commande = assignation.commande
+            date_commande = commande.date_commande
+            date_limite = commande.date_limite
+
+            if date_commande  and date_limite > date_commande:
+                temps_total = (date_limite - date_commande).total_seconds()
+                temps_ecoule = (now - date_commande).total_seconds()
+                pourcentage_utilise = min(max((temps_ecoule / temps_total) * 100, 0), 100)  # clamp entre 0 et 100
+            else:
+                pourcentage_utilise = None
+
+            commandes_infos.append({
+                "assignation": assignation,
+                "commande": commande,
+                "temps_utilise_pourcent": round(pourcentage_utilise, 1) if pourcentage_utilise is not None else "N/A"
+            })
+        return render(request, "app1/liste_commande_a_traiter.html", {
+            "commandes_infos": commandes_infos
         })
 
 @login_required
@@ -1127,11 +1153,9 @@ def fichier_intervention(request):
 @login_required
 def uploader_fiche_intervention(request):
     if request.method=="POST":
+            utilisateur=CustomUser.objects.get(id=request.user.id)
             fichier=request.FILES.get("fichier")
             type_mime, encoding = mimetypes.guess_type(fichier.name)
-            print("Type MIME :", type_mime)
-            fichier_extension=fichier.name[-4:]
-            print(fichier_extension)
             types_acceptes = ["image/jpeg","image/jpg","image/png", "application/pdf"]
             max_taille=5*1024*1024
             if type_mime in types_acceptes and fichier.size<=max_taille:
@@ -1140,7 +1164,14 @@ def uploader_fiche_intervention(request):
                     user=request.user,
                 )
                 print(a)
-                return redirect('technicien_dashboard')
+                if utilisateur.role=="technicien":
+                    return redirect('technicien_dashboard')
+
+                elif utilisateur.role=="commercial":
+                    return redirect('commercial_dashboard')
+
+                elif utilisateur.role=="coursier":
+                    return redirect('coursier_dashboard')
             else:
                 return HttpResponse("ce fichier ne respecte pas les normes ")
     return render(request,"app1/uploader-fiche_intervention.html")
@@ -1172,4 +1203,32 @@ def nombre_intervention_par_user(request):
         """)
         result = cursor.fetchall()
     return render(request,"app1/nombe_fiche_intervention_par_user.html",{"result":result})
+
+@login_required
+def temps_ecoule_avant_date_limiter(request):
+    coursier = CustomUser.objects.get(id=request.user.id)
+    commandes_assignées = CoursierCommande.objects.filter(
+        coursier=coursier,
+        Commande__statut="en_preparation")
+    commandes_infos = []
+    now = timezone.now()
+
+    for assignation in commandes_assignées:
+        commande = assignation.Commande
+        date_commande = commande.date_commande
+        date_limite = commande.date_limite
+
+        if date_commande and date_limite and  date_limite > date_commande:
+            temps_total = (date_limite - date_commande).total_seconds()
+            temps_ecoule = (now - date_commande).total_seconds()
+            pourcentage_utilise = min(max((temps_ecoule / temps_total) * 100, 0), 100)  # clamp entre 0 et 100
+        else:
+            pourcentage_utilise = None
+        commandes_infos.append({
+            "assignation": assignation,
+            "commande": commande,
+            "temps_utilise_pourcent": round(pourcentage_utilise, 1) if pourcentage_utilise is not None else "N/A"
+        })
+    return render(request,"app1/temps_ecouler_coursier.html",{"commandes_infos":commandes_infos})
+
 

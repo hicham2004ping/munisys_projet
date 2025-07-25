@@ -100,3 +100,4 @@ class UserInterventino(models.Model):
 
 class fichier_upload(models.Model):
     numero=models.IntegerField()
+

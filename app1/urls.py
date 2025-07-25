@@ -58,5 +58,6 @@ path('fichier-intervention', views.fichier_intervention, name='intervention'),
 path('uploader/fichier-intervention', views.uploader_fiche_intervention, name='uploader'),
 path('dashboard/admin/interventions', views.historique_intervention, name='historique_intervention'),
 path('dashboard/admin/nombre-interventions', views.nombre_intervention_par_user, name='nombre_intervention_par_user'),
+path('dashboard/coursier/temps-ecouler', views.temps_ecoule_avant_date_limiter, name='temps_ecouler_coursier'),
 
 ]
