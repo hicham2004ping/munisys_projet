@@ -59,5 +59,6 @@ path('uploader/fichier-intervention', views.uploader_fiche_intervention, name='u
 path('dashboard/admin/interventions', views.historique_intervention, name='historique_intervention'),
 path('dashboard/admin/nombre-interventions', views.nombre_intervention_par_user, name='nombre_intervention_par_user'),
 path('dashboard/coursier/temps-ecouler', views.temps_ecoule_avant_date_limiter, name='temps_ecouler_coursier'),
-
+path('dashboard/commerciale/temps-ecouler', views.temps_ecoule_avant_date_limiter_commercial, name='temps_ecouler_commerciale'),
+path('dashboard/technicien/temps-ecouler', views.temps_ecoule_avant_date_limiter_technicien, name='temps_ecouler_technicien'),
 ]

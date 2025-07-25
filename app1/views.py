@@ -394,6 +394,7 @@ def liste_commande_assinger(request):
                 commande=commande,
                 technicien=technicien,
             )
+
             print(preparer_commande_technicien)
 
             return redirect("liste_commande_assinger")
@@ -1168,10 +1169,13 @@ def uploader_fiche_intervention(request):
                     return redirect('technicien_dashboard')
 
                 elif utilisateur.role=="commercial":
-                    return redirect('commercial_dashboard')
+                    return redirect('comercial-dashboard')
 
                 elif utilisateur.role=="coursier":
                     return redirect('coursier_dashboard')
+
+                elif request.user.is_superuser:
+                    return redirect('adminn')
             else:
                 return HttpResponse("ce fichier ne respecte pas les normes ")
     return render(request,"app1/uploader-fiche_intervention.html")
@@ -1207,9 +1211,7 @@ def nombre_intervention_par_user(request):
 @login_required
 def temps_ecoule_avant_date_limiter(request):
     coursier = CustomUser.objects.get(id=request.user.id)
-    commandes_assignées = CoursierCommande.objects.filter(
-        coursier=coursier,
-        Commande__statut="en_preparation")
+    commandes_assignées = CoursierCommande.objects.filter(coursier=coursier).filter(~Q(Commande__statut="annuler") & ~Q(Commande__statut="finaliser"))
     commandes_infos = []
     now = timezone.now()
 
@@ -1231,4 +1233,57 @@ def temps_ecoule_avant_date_limiter(request):
         })
     return render(request,"app1/temps_ecouler_coursier.html",{"commandes_infos":commandes_infos})
 
+@login_required
+def temps_ecoule_avant_date_limiter_commercial(request):
+    commerciale = CustomUser.objects.get(id=request.user.id)
+    commandes_assignées = Commande.objects.filter(comerciale=commerciale).filter(~Q(statut="finaliser") & ~Q(statut="annuler"))
+    commandes_infos = []
+    now = timezone.now()
 
+    for assignation in commandes_assignées:
+        date_commande = assignation.date_commande
+        print(date_commande)
+        date_limite = assignation.date_limite
+        print(date_limite)
+        if date_commande and date_limite and  date_limite > date_commande:
+            temps_total = (date_limite - date_commande).total_seconds()
+            temps_ecoule = (now - date_commande).total_seconds()
+            pourcentage_utilise = min(max((temps_ecoule / temps_total) * 100, 0), 100)  # clamp entre 0 et 100
+        else:
+            pourcentage_utilise = None
+        commandes_infos.append({
+            "assignation": assignation,
+            "commande": assignation,
+            "temps_utilise_pourcent": round(pourcentage_utilise, 1) if pourcentage_utilise is not None else "N/A"
+        })
+    return render(request,"app1/temps_ecouler_commerciale.html",{"commandes_infos":commandes_infos})
+
+@login_required
+def temps_ecoule_avant_date_limiter_technicien(request):
+    technicien = CustomUser.objects.get(id=request.user.id)
+    print(technicien.username)
+    commandes_assignées = PreparerCommande.objects.filter(technicien=technicien).filter(~Q(commande__statut="finaliser") & ~Q(commande__statut="annuler"))
+    print(commandes_assignées)
+    commandes_infos = []
+    now = timezone.now()
+
+    for assignation in commandes_assignées:
+        commande = assignation.commande
+        print("l'id de la commande est ",commande.id)
+        date_commande = commande.date_commande
+        date_limite = commande.date_limite
+
+        if date_commande and date_limite and  date_limite > date_commande:
+            temps_total = (date_limite - date_commande).total_seconds()
+            temps_ecoule = (now - date_commande).total_seconds()
+            pourcentage_utilise = min(max((temps_ecoule / temps_total) * 100, 0), 100)
+            print(temps_ecoule," le temps total est ",temps_total)
+        else:
+            pourcentage_utilise = None
+        commandes_infos.append({
+            "assignation": assignation,
+            "commande": commande,
+            "temps_utilise_pourcent": round(pourcentage_utilise, 1) if pourcentage_utilise is not None else "N/A"
+
+        })
+    return render(request,"app1/temps_ecouler_technicien.html",{"commandes_infos":commandes_infos})

@@ -110,32 +110,7 @@
                 <p><strong>ID de commande :</strong> {{ c.commande.id }}</p>
                 <p><strong>Statut :</strong> {{ c.commande.statut }}</p>
 
-                <!-- Barre de progression -->
-                <p><strong>Temps utilisé :</strong>
-                    {% if c.temps_utilise_pourcent != "N/A" %}
-                        {{ c.temps_utilise_pourcent }}%
-                        <div class="progress mt-2" style="height: 20px;">
-                            <div class="progress-bar"
-                                 role="progressbar"
-                                 style="width: {{ c.temps_utilise_pourcent }}%;
-                                        background-color:
-                                            {% if c.temps_utilise_pourcent > 80 %}
-                                                #dc3545
-                                            {% elif c.temps_utilise_pourcent > 50 %}
-                                                #ffc107
-                                            {% else %}
-                                                #198754
-                                            {% endif %};">
-                                {{ c.temps_utilise_pourcent }}%
-                            </div>
-                        </div>
-                    {% else %}
-                        Non disponible
-                    {% endif %}
-                </p>
-
                 <a href="?preparer={{ c.commande.id }}">Préparer</a>
-
                 <hr>
                 <p><strong>Produits commandés :</strong></p>
                 <ul>
