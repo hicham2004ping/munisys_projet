@@ -25,6 +25,7 @@
             z-index: -1;
         }
 
+        /* Navbar */
         .navbar {
             background-color: white;
             padding: 1rem 2rem;
@@ -53,40 +54,71 @@
             color: #3498db;
         }
 
-        .container {
-            margin-top: 60px;
-            max-width: 800px;
-            margin-left: auto;
-            margin-right: auto;
-            text-align: center;
+        /* Layout principal */
+        .dashboard-container {
+            display: flex;
+            height: calc(100vh - 70px);
         }
 
-        h3 {
-            color: #2c3e50;
-            font-size: 2rem;
-            margin-bottom: 30px;
+        /* Sidebar */
+        .sidebar {
+            width: 250px;
+            background-color: #25658f;
+            padding: 20px;
+            display: flex;
+            flex-direction: column;
+            align-items: stretch;
+            box-shadow: 2px 0 8px rgba(0,0,0,0.1);
         }
 
-        .dashboard-links a {
-            display: block;
-            margin: 15px auto;
-            padding: 12px 20px;
-            max-width: 350px;
-            background-color: #3498db;
-            color: white;
-            border-radius: 8px;
-            text-decoration: none;
-            font-weight: 500;
+      .sidebar a {
+    display: flex;
+    align-items: center;
+    padding: 12px 15px;
+    margin-bottom: 12px;
+    background-color: rgba(255, 255, 255, 0.08); /* Plus sombre que 0.15 */
+    color: #ffffff !important;
+    border-radius: 10px;
+    text-decoration: none;
+    font-weight: 500;
+    transition: background-color 0.3s ease, transform 0.2s ease;
+}
+
+.sidebar a i {
+    margin-right: 10px;
+    color: #ffffff !important;
+}
+
+.sidebar a:hover {
+    background-color: rgba(255, 255, 255, 0.25); /* Fond clair au survol */
+    transform: translateX(5px);
+}
+
+        /* Empêche la couleur des liens visités de changer */
+        .sidebar a:visited {
+            color: white !important;
+        }
+
+        /* Contenu principal */
+        .main-content {
+            flex: 1;
+            padding: 30px;
+        }
+
+        .stats-placeholder {
+            background-color: white;
+            border-radius: 12px;
+            padding: 30px;
             box-shadow: 0 2px 8px rgba(0,0,0,0.1);
-            transition: background-color 0.3s ease;
-        }
-
-        .dashboard-links a:hover {
-            background-color: #2980b9;
+            text-align: center;
+            min-height: 300px;
+            font-size: 1.2rem;
+            color: #555;
         }
     </style>
 </head>
 <body>
+    <!-- Navbar -->
     <div class="navbar">
         <div class="brand"><a href="{% url 'technicien_dashboard' %}">Munisys</a></div>
         <div class="actions">
@@ -99,18 +131,26 @@
         </div>
     </div>
 
-    <div class="container">
-        <h3>Bienvenue dans votre tableau de bord</h3>
-        <div class="dashboard-links">
-            <a href="{% url 'consulter_materielle' %}">Effectuer un mouvement</a>
-            <a href="{% url 'technicien_commande_concerner' %}">Voir les commandes qui me concernent</a>
-            <a href="{% url 'historique_mouvements' %}">Voir l'historique des mouvements</a>
-            <a href="{% url 'historique_installations' %}">Voir l'historique des commandes installer</a>
-            <a href="{% url 'commande_preparer' %}">Voir les commandes a preparer</a>
-            <a href="{% url 'commande_installer' %}">les commandes a installer</a>
-            <a href="{% url 'intervention' %}">Telecharger le fiche d'intervention</a>
-            <a href="{% url 'uploader' %}">uploader intervention</a>
-            <a href="{% url 'temps_ecouler_technicien' %}">Voir le temps restant pour chaque commande</a>
+    <!-- Dashboard -->
+    <div class="dashboard-container">
+        <!-- Sidebar -->
+        <div class="sidebar">
+            <a href="{% url 'consulter_materielle' %}"><i class="fas fa-exchange-alt"></i> Effectuer un mouvement</a>
+            <a href="{% url 'technicien_commande_concerner' %}"><i class="fas fa-list"></i> Commandes concernées</a>
+            <a href="{% url 'historique_mouvements' %}"><i class="fas fa-history"></i> Historique mouvements</a>
+            <a href="{% url 'historique_installations' %}"><i class="fas fa-check-circle"></i> Historique installations</a>
+            <a href="{% url 'commande_preparer' %}"><i class="fas fa-box-open"></i> Commandes à préparer</a>
+            <a href="{% url 'commande_installer' %}"><i class="fas fa-tools"></i> Commandes à installer</a>
+            <a href="{% url 'intervention' %}"><i class="fas fa-file-download"></i> Télécharger fiche intervention</a>
+            <a href="{% url 'uploader' %}"><i class="fas fa-upload"></i> Uploader intervention</a>
+            <a href="{% url 'temps_ecouler_technicien' %}"><i class="fas fa-clock"></i> Temps restant commandes</a>
+        </div>
+
+        <!-- Main Content -->
+        <div class="main-content">
+            <div class="stats-placeholder">
+                📊 Zone réservée aux statistiques, graphiques et rapports
+            </div>
         </div>
     </div>
 </body>

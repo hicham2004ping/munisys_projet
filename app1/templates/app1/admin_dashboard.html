@@ -174,6 +174,10 @@
         <li class="nav-item">
             <a class="nav-link" data-bs-toggle="tab" href="#interventions">Interventions</a>
         </li>
+        <!-- Nouvel onglet Migrations -->
+        <li class="nav-item">
+            <a class="nav-link" data-bs-toggle="tab" href="#migrations">Migrations</a>
+        </li>
     </ul>
 
     <div class="tab-content">
@@ -288,6 +292,33 @@
                 </div>
             </div>
         </div>
+
+        <!-- MIGRATIONS -->
+        <div class="tab-pane fade" id="migrations">
+            <h2 class="section-title">Migrations depuis fichiers Excel</h2>
+            <div class="row">
+                <div class="col-lg-8">
+                    <div class="card p-3">
+                        <div class="card-body">
+                            <a href="{% url 'import-users' %}" class="btn btn-primary btn-action"><i class="fas fa-file-import"></i> Importer Utilisateurs</a>
+                            <a href="{% url 'import-clients' %}" class="btn btn-primary btn-action"><i class="fas fa-file-import"></i> Importer Clients</a>
+                            <a href="{% url 'import-commandes' %}" class="btn btn-primary btn-action"><i class="fas fa-file-import"></i> Importer Commandes</a>
+                            <a href="{% url 'import-courses' %}" class="btn btn-primary btn-action"><i class="fas fa-file-import"></i> Importer Coursiers Commandes</a>
+                            <a href="{% url 'import-installations' %}" class="btn btn-primary btn-action"><i class="fas fa-file-import"></i> Importer Installations Technicien</a>
+                            <a href="{% url 'import-preparation' %}" class="btn btn-primary btn-action"><i class="fas fa-file-import"></i> Importer Préparations Commandes Technicien</a>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-lg-4">
+                    <div class="stat-card">
+                        <i class="fas fa-database fa-2x mb-2"></i>
+                        <h3>Migrations Excel</h3>
+                        <p>Importer les données dans la base</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+
     </div>
 </div>
 

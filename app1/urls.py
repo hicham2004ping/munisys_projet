@@ -61,4 +61,11 @@ path('dashboard/admin/nombre-interventions', views.nombre_intervention_par_user,
 path('dashboard/coursier/temps-ecouler', views.temps_ecoule_avant_date_limiter, name='temps_ecouler_coursier'),
 path('dashboard/commerciale/temps-ecouler', views.temps_ecoule_avant_date_limiter_commercial, name='temps_ecouler_commerciale'),
 path('dashboard/technicien/temps-ecouler', views.temps_ecoule_avant_date_limiter_technicien, name='temps_ecouler_technicien'),
+path('dashboard/admin/migrer', views.import_users, name='import-users'),
+path('dashboard/admin/migrer/client', views.import_clients, name='import-clients'),
+path('dashboard/admin/migrer/commandes', views.import_commandes, name='import-commandes'),
+path('dashboard/admin/migrer/courses', views.import_couriser_commandes, name='import-courses'),
+path('dashboard/admin/migrer/installations', views.import_installations_techncien, name='import-installations'),
+path('dashboard/admin/migrer/preparation', views.import_preparer_technicien, name='import-preparation'),
+
 ]

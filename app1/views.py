@@ -1,3 +1,5 @@
+import sqlalchemy
+import pandas as pd
 import mimetypes
 from django.core.exceptions import ValidationError
 from django.core.validators import validate_email
@@ -1287,3 +1289,144 @@ def temps_ecoule_avant_date_limiter_technicien(request):
 
         })
     return render(request,"app1/temps_ecouler_technicien.html",{"commandes_infos":commandes_infos})
+
+def import_users(request):
+    if request.method == "POST":
+        fichier=request.FILES.get('fichier')
+        if fichier:
+            type_mime, encoding = mimetypes.guess_type(fichier.name)
+            types_acceptes = ["text/csv", "application/vnd.ms-excel", "application/octet-stream"]
+            if type_mime  in types_acceptes:
+                try:
+                    df=pd.read_csv(fichier)
+                    conn = sqlalchemy.create_engine(
+                    'mysql+mysqlconnector://root:@localhost:3306/gestion_inventaire'
+                    )
+                    df.to_sql(name='app1_customuser',index=False,if_exists='append',con=conn)
+                    return redirect('adminn')
+                except Exception as e:
+                    return render(request,'app1/uploader_csv_users.html',{'error':f"erreur lors de l'import {str(e)}"})
+            else:
+                return HttpResponse('le format du fichier nest pas valide')
+        else:
+            return HttpResponse('aucun fichier na ete choisis')
+    return render(request,'app1/uploader_csv_users.html')
+
+def import_clients(request):
+    if request.method == "POST":
+        fichier=request.FILES.get('fichier')
+        if fichier:
+            type_mime, encoding = mimetypes.guess_type(fichier.name)
+            types_acceptes = ["text/csv", "application/vnd.ms-excel", "application/octet-stream"]
+            if type_mime  in types_acceptes:
+                try:
+                    df=pd.read_csv(fichier)
+                    conn = sqlalchemy.create_engine(
+                    'mysql+mysqlconnector://root:@localhost:3306/gestion_inventaire'
+                    )
+                    df.to_sql(name='app1_client',index=False,if_exists='append',con=conn)
+                    return redirect('adminn')
+                except Exception as e:
+                    return render(request,'app1/uploader_csv_client.html',{'error':f"erreur lors de l'import {str(e)}"})
+            else:
+                return HttpResponse('le format du fichier nest pas valide')
+        else:
+            return HttpResponse('aucun fichier na ete choisis')
+    return render(request,'app1/uploader_csv_client.html')
+
+def import_commandes(request):
+    if request.method == "POST":
+        fichier=request.FILES.get('fichier')
+        fichier1=request.FILES.get('fichier1')
+        if fichier and fichier1:
+            type_mime, encoding = mimetypes.guess_type(fichier.name)
+            type_mime1, encoding1 = mimetypes.guess_type(fichier1.name)
+
+            types_acceptes = ["text/csv", "application/vnd.ms-excel", "application/octet-stream"]
+            if type_mime and type_mime1 in types_acceptes:
+                try:
+                    df=pd.read_csv(fichier)
+                    df1=pd.read_csv(fichier1)
+                    conn = sqlalchemy.create_engine(
+                    'mysql+mysqlconnector://root:@localhost:3306/gestion_inventaire'
+                    )
+                    df.to_sql(name='app1_commande',index=False,if_exists='append',con=conn)
+                    df1.to_sql(name='app1_lignedecommande',index=False,if_exists='append',con=conn)
+                    return redirect('adminn')
+                except Exception as e:
+                    return render(request,'app1/importer_csv_commandes.html',{'error':f"erreur lors de l'import {str(e)}"})
+            else:
+                return HttpResponse('le format du fichier nest pas valide')
+        else:
+            return HttpResponse('aucun fichier na ete choisis')
+    return render(request,'app1/importer_csv_commandes.html')
+
+def import_couriser_commandes(request):
+    if request.method == "POST":
+        fichier=request.FILES.get('fichier')
+        if fichier:
+            type_mime, encoding = mimetypes.guess_type(fichier.name)
+
+            types_acceptes = ["text/csv", "application/vnd.ms-excel", "application/octet-stream"]
+            if type_mime  in types_acceptes:
+                try:
+                    df=pd.read_csv(fichier)
+                    conn = sqlalchemy.create_engine(
+                    'mysql+mysqlconnector://root:@localhost:3306/gestion_inventaire'
+                    )
+                    df.to_sql(name='app1_coursiercommande',index=False,if_exists='append',con=conn)
+                    return redirect('adminn')
+                except Exception as e:
+                    return render(request,'app1/upload_coursier_commande_csv.html',{'error':f"erreur lors de l'import {str(e)}"})
+            else:
+                return HttpResponse('le format du fichier nest pas valide')
+        else:
+            return HttpResponse('aucun fichier na ete choisis')
+    return render(request,'app1/upload_coursier_commande_csv.html')
+
+def import_installations_techncien(request):
+    if request.method == "POST":
+        fichier=request.FILES.get('fichier')
+        if fichier:
+            type_mime, encoding = mimetypes.guess_type(fichier.name)
+            types_acceptes = ["text/csv", "application/vnd.ms-excel", "application/octet-stream"]
+            if type_mime  in types_acceptes:
+                try:
+                    df=pd.read_csv(fichier)
+                    conn = sqlalchemy.create_engine(
+                    'mysql+mysqlconnector://root:@localhost:3306/gestion_inventaire'
+                    )
+                    df.to_sql(name='app1_installation',index=False,if_exists='append',con=conn)
+                    return redirect('adminn')
+                except Exception as e:
+                    return render(request,'app1/upload_installations_csv.html',{'error':f"erreur lors de l'import {str(e)}"})
+            else:
+                return HttpResponse('le format du fichier nest pas valide')
+        else:
+            return HttpResponse('aucun fichier na ete choisis')
+    return render(request,'app1/upload_installations_csv.html')
+
+def import_preparer_technicien(request):
+    if request.method == "POST":
+        fichier=request.FILES.get('fichier')
+        if fichier:
+            type_mime, encoding = mimetypes.guess_type(fichier.name)
+            types_acceptes = ["text/csv", "application/vnd.ms-excel", "application/octet-stream"]
+            if type_mime  in types_acceptes:
+                try:
+                    df=pd.read_csv(fichier)
+                    conn = sqlalchemy.create_engine(
+                    'mysql+mysqlconnector://root:@localhost:3306/gestion_inventaire'
+                    )
+                    df.to_sql(name='app1_preparercommande',index=False,if_exists='append',con=conn)
+                    return redirect('adminn')
+                except Exception as e:
+                    return render(request,'app1/upload_preparation_csv.html.html',{'error':f"erreur lors de l'import {str(e)}"})
+            else:
+                return HttpResponse('le format du fichier nest pas valide')
+        else:
+            return HttpResponse('aucun fichier na ete choisis')
+    return render(request,'app1/upload_preparation_csv.html.html')
+
+
+
