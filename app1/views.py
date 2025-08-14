@@ -1,4 +1,5 @@
 import sqlalchemy
+import traceback
 import pandas as pd
 import mimetypes
 from django.core.exceptions import ValidationError
@@ -83,8 +84,11 @@ def admin_dashboard(request):
     debut_mois = today.replace(day=1)
     mats=Materiel.objects.all()
     somme=0
-    nombre_telechargement=fichier_upload.objects.get(id=1).numero
-    print(nombre_telechargement)
+    fichier_telechargement=fichier_upload.objects.filter(id=1).first()
+    if fichier_telechargement:
+        nombre_telechargement = fichier_telechargement.numero
+    else:
+        nombre_telechargement=0
     f1=UserInterventino.objects.all()
     total_upload=f1.count()
     for mat in mats:
@@ -376,8 +380,23 @@ def liste_commande_assinger(request):
             commande.statut = "valider"
             commande.save()
             user=CustomUser.objects.filter(username=commande.client.email).first()
+
+            list_technicien_occuper=CustomUser.objects.filter(
+               Q(preparercommande__statut="en_preparation")|
+               Q(installation__statut="en_attente")
+            ).distinct()
+            print("le contenu de las liste est ",list_technicien_occuper)
             technicien=get_suivant("technicien")
-            print("l'id du technicien est:"," le technicien c'est :",technicien)
+
+            for i in list_technicien_occuper:
+                if i.username==technicien.username:
+                    print(i," est occuper par une commande on va passer au technicien suivant")
+                    technicien=get_suivant("technicien")
+                    print("on a passer au technicien suivant qui est ", technicien.username)
+                else:
+                    print("cette commande est peut etre traiter on a trouver un technicien libre")
+                    break
+
 
             Notification.objects.create(
                 destinataire=user,
@@ -392,12 +411,11 @@ def liste_commande_assinger(request):
                 message=f"la commande d'id {commande_idd} qui appatient a l'utilisateur  {commande.client.nom} a ete valider",
           )
 
-            preparer_commande_technicien=PreparerCommande.objects.create(
+            PreparerCommande.objects.create(
                 commande=commande,
                 technicien=technicien,
+                statut="en_cours",
             )
-
-            print(preparer_commande_technicien)
 
             return redirect("liste_commande_assinger")
 
@@ -405,7 +423,14 @@ def liste_commande_assinger(request):
             statut="accepter",
             comerciale_id=request.user.id,
         )
-        return render(request, "app1/liste_commande_assigner.html", {"liste_commande": liste_commande})
+        techniciens_libres = CustomUser.objects.filter(
+            role="technicien"
+        ).exclude(
+            Q(preparercommande__statut="en_preparation") |
+            Q(installation__statut="en_attente")
+        ).distinct()
+
+        return render(request, "app1/liste_commande_assigner.html", {"liste_commande": liste_commande,"techniciens_libres":techniciens_libres.count()})
 
 @login_required
 def historique_commande_passe(request):
@@ -499,17 +524,12 @@ def passer_commande(request):
     panier = request.session.get("panier", {})
     if not panier:
         return redirect("afficher_panier")
-    print('bonjour')
     if request.method == "POST":
         try:
             date_limite = request.POST.get('date')
             penalite = int(request.POST.get("penalite"))
-            print('la date limite est ',date_limite,'son type est ',type(date_limite))
-            print("penalite",penalite)
-            print('la penalite est ',penalite)
             client = Client.objects.get(email=request.user.username)
             commercial_assigne = get_suivant("commercial")
-            print(commercial_assigne,"c'est le commericale",client,"c'est le client")
             commande = Commande.objects.create(
                 client=client,
                 statut='en attente',
@@ -851,16 +871,25 @@ def preparer_commande_technicien(request):
     if "preparer" in request.GET:
         id = request.GET.get("preparer")
         commande = Commande.objects.get(id=id)
+        technicien=CustomUser.objects.get(id=request.user.id)
 
         if commande.statut == "annuler":
             messages.error(request, "Cette commande a été annulée par le client.")
             return redirect("commande_preparer")
 
-        commande.statut = "en_preparation"
+        commande.statut = "preparation_terminer"
         commande.save()
+        hassan=PreparerCommande.objects.get(commande=commande)
+
+        hassan.statut="preparation_terminer"
+        hassan.save()
 
         coursier_assigner = get_suivant("coursier")
-        CoursierCommande.objects.create(Commande=commande, coursier=coursier_assigner)
+
+        CoursierCommande.objects.create(Commande=commande,
+            coursier=coursier_assigner,
+            statut="en_expedition"
+        )
 
         lignes = commande.lignes.all()
         for ligne in lignes:
@@ -922,20 +951,28 @@ def liste_commande_assinger_coursier(request):
             return redirect('commande_coursier')
         commande.statut='expediter'
         commande.save()
+        coursier_commande=CoursierCommande.objects.get(Commande=commande)
+        coursier_commande.statut="fin_expedition"
+        coursier_commande.save()
+        print(coursier_commande.statut)
         return redirect('commande_coursier')
     elif "livrer" in request.GET:
         id=request.GET.get("livrer")
         commande=Commande.objects.get(id=id)
         commande.statut='livrer'
+
+        coursier_commande = CoursierCommande.objects.get(Commande=commande)
+        coursier_commande.statut = "fin_livraison"
+        coursier_commande.save()
+
+        print(coursier_commande.statut)
         technicien=AffectationUtilisateur.objects.get(id=1)
         technicien=technicien.dernier_technicien
-        print(technicien)
         c=Installation.objects.create(
             statut="en_attente",
             technicien=technicien,
             commande=commande
         )
-        print(c)
         commande.save()
         a=Notification.objects.create(
             titre="livraison d'une commande",
@@ -982,8 +1019,14 @@ def commande_a_installer_technicien(request):
     if "installer" in request.GET:
         id=request.GET.get("installer")
         cmd=Commande.objects.get(id=id)
+        print(cmd)
+        installation=Installation.objects.get(commande=cmd)
+        print(installation)
+        installation.statut = "terminer"
+        installation.save()
         cmd.statut='installer'
         cmd.save()
+        print("terminer")
         return redirect('commande_installer')
     else:
         commandes = Commande.objects.filter(
@@ -1290,6 +1333,7 @@ def temps_ecoule_avant_date_limiter_technicien(request):
         })
     return render(request,"app1/temps_ecouler_technicien.html",{"commandes_infos":commandes_infos})
 
+@login_required
 def import_users(request):
     if request.method == "POST":
         fichier=request.FILES.get('fichier')
@@ -1305,13 +1349,14 @@ def import_users(request):
                     df.to_sql(name='app1_customuser',index=False,if_exists='append',con=conn)
                     return redirect('adminn')
                 except Exception as e:
-                    return render(request,'app1/uploader_csv_users.html',{'error':f"erreur lors de l'import {str(e)}"})
+                    return HttpResponse("une erreur s'est produit")
             else:
                 return HttpResponse('le format du fichier nest pas valide')
         else:
             return HttpResponse('aucun fichier na ete choisis')
     return render(request,'app1/uploader_csv_users.html')
 
+@login_required
 def import_clients(request):
     if request.method == "POST":
         fichier=request.FILES.get('fichier')
@@ -1334,6 +1379,7 @@ def import_clients(request):
             return HttpResponse('aucun fichier na ete choisis')
     return render(request,'app1/uploader_csv_client.html')
 
+@login_required
 def import_commandes(request):
     if request.method == "POST":
         fichier=request.FILES.get('fichier')
@@ -1341,17 +1387,19 @@ def import_commandes(request):
         if fichier and fichier1:
             type_mime, encoding = mimetypes.guess_type(fichier.name)
             type_mime1, encoding1 = mimetypes.guess_type(fichier1.name)
-
             types_acceptes = ["text/csv", "application/vnd.ms-excel", "application/octet-stream"]
-            if type_mime and type_mime1 in types_acceptes:
+
+            if type_mime in types_acceptes and type_mime1 in types_acceptes:
                 try:
                     df=pd.read_csv(fichier)
                     df1=pd.read_csv(fichier1)
                     conn = sqlalchemy.create_engine(
                     'mysql+mysqlconnector://root:@localhost:3306/gestion_inventaire'
                     )
-                    df.to_sql(name='app1_commande',index=False,if_exists='append',con=conn)
-                    df1.to_sql(name='app1_lignedecommande',index=False,if_exists='append',con=conn)
+                    with conn.begin() as connection:
+                        df.to_sql(name='app1_commande', index=False, if_exists='append', con=connection)
+                        df1.to_sql(name='app1_lignedecommande', index=False, if_exists='append', con=connection)
+
                     return redirect('adminn')
                 except Exception as e:
                     return render(request,'app1/importer_csv_commandes.html',{'error':f"erreur lors de l'import {str(e)}"})
@@ -1361,6 +1409,7 @@ def import_commandes(request):
             return HttpResponse('aucun fichier na ete choisis')
     return render(request,'app1/importer_csv_commandes.html')
 
+@login_required
 def import_couriser_commandes(request):
     if request.method == "POST":
         fichier=request.FILES.get('fichier')
@@ -1384,6 +1433,7 @@ def import_couriser_commandes(request):
             return HttpResponse('aucun fichier na ete choisis')
     return render(request,'app1/upload_coursier_commande_csv.html')
 
+@login_required
 def import_installations_techncien(request):
     if request.method == "POST":
         fichier=request.FILES.get('fichier')
@@ -1406,6 +1456,7 @@ def import_installations_techncien(request):
             return HttpResponse('aucun fichier na ete choisis')
     return render(request,'app1/upload_installations_csv.html')
 
+@login_required
 def import_preparer_technicien(request):
     if request.method == "POST":
         fichier=request.FILES.get('fichier')
@@ -1421,12 +1472,36 @@ def import_preparer_technicien(request):
                     df.to_sql(name='app1_preparercommande',index=False,if_exists='append',con=conn)
                     return redirect('adminn')
                 except Exception as e:
-                    return render(request,'app1/upload_preparation_csv.html.html',{'error':f"erreur lors de l'import {str(e)}"})
+                    return render(request,'app1/upload_preparation_csv.html',{'error':f"erreur lors de l'import {str(e)}"})
             else:
                 return HttpResponse('le format du fichier nest pas valide')
         else:
             return HttpResponse('aucun fichier na ete choisis')
-    return render(request,'app1/upload_preparation_csv.html.html')
+    return render(request,'app1/upload_preparation_csv.html')
 
-
+@login_required
+def import_mouvements(request):
+    if request.method == "POST":
+        fichier=request.FILES.get('fichier')
+        if fichier:
+            print(fichier)
+            type_mime, encoding = mimetypes.guess_type(fichier.name)
+            types_acceptes = ["text/csv", "application/vnd.ms-excel", "application/octet-stream"]
+            if type_mime in types_acceptes:
+                try:
+                    df=pd.read_csv(fichier)
+                    conn = sqlalchemy.create_engine(
+                    'mysql+mysqlconnector://root:@localhost:3306/gestion_inventaire'
+                    )
+                    print(df.dtypes)
+                    df.to_sql(name='app1_mouvement', index=False, if_exists='append', con=conn)
+                    return redirect('adminn')
+                except Exception as e:
+                    print(traceback.format_exc())
+                    return render(request,'app1/importer_mouvements.html',{'error':f"erreur lors de l'import {str(e)}"})
+            else:
+                return HttpResponse('le format du fichier nest pas valide')
+        else:
+            return HttpResponse('aucun fichier na ete choisis')
+    return render(request,'app1/importer_mouvements.html')
 

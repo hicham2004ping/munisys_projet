@@ -3,7 +3,6 @@ from django.urls import path, include
 from app1 import views
 
 urlpatterns = [
-
 path('',views.welcomeview,name="acceuille"),
 path('login/', views.login_view, name="login"),
 path('dashboard/adminn/', views.admin_dashboard, name="adminn"),
@@ -67,5 +66,6 @@ path('dashboard/admin/migrer/commandes', views.import_commandes, name='import-co
 path('dashboard/admin/migrer/courses', views.import_couriser_commandes, name='import-courses'),
 path('dashboard/admin/migrer/installations', views.import_installations_techncien, name='import-installations'),
 path('dashboard/admin/migrer/preparation', views.import_preparer_technicien, name='import-preparation'),
+path('dashboard/admin/migrer/mouvements', views.import_mouvements, name='import_mouvements'),
 
 ]

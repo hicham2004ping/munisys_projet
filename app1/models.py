@@ -82,11 +82,12 @@ class AffectationUtilisateur(models.Model):
 class PreparerCommande(models.Model):
     commande = models.ForeignKey(Commande, on_delete=models.CASCADE)
     technicien=models.ForeignKey(CustomUser, on_delete=models.CASCADE)
+    statut=models.CharField(max_length=100,blank=True,null=True)
 
 class CoursierCommande(models.Model):
     coursier=models.ForeignKey(CustomUser,on_delete=models.CASCADE)
     Commande=models.ForeignKey(Commande,on_delete=models.CASCADE)
-
+    statut=models.CharField(max_length=100,blank=True,null=True)
 
 class ClienCommandeAvis(models.Model):
     commande=models.ForeignKey(Commande,on_delete=models.CASCADE)

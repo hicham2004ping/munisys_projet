@@ -113,7 +113,7 @@
                 <p><strong>Email :</strong> {{ c.Commande.client.email }}</p>
                 <p><strong>Date commande :</strong> {{ c.Commande.date_commande }}</p>
 
-                {% if c.Commande.statut == 'en_preparation' %}
+                {% if c.Commande.statut == 'preparation_terminer' %}
                 <a href="?expediter={{c.Commande.id}}">Expediter</a>
                 {% endif %}
                 {% if c.Commande.statut == "expediter"  %}
