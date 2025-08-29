@@ -2,107 +2,904 @@
 <html lang="fr">
 <head>
     <meta charset="UTF-8">
-    <title>Interventions - Munisys</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Dashboard - Munisys</title>
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
     <style>
         :root {
-            --primary-color: #25658f;
-            --accent-color: #8f2565;
-            --light-overlay: rgba(255, 255, 255, 0.95);
-            --shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
-            --border-radius: 10px;
+            --munisys-primary: #25658f;
+            --munisys-secondary: #8f2565;
+            --munisys-accent: #71a3c4;
+            --munisys-primary-light: rgba(37, 101, 143, 0.1);
+            --munisys-secondary-light: rgba(143, 37, 101, 0.1);
+            --munisys-accent-light: rgba(113, 163, 196, 0.1);
+            --gradient-primary: linear-gradient(135deg, var(--munisys-primary) 0%, var(--munisys-secondary) 100%);
+            --gradient-accent: linear-gradient(135deg, var(--munisys-accent) 0%, var(--munisys-primary) 100%);
+            --shadow-soft: 0 10px 40px rgba(37, 101, 143, 0.12);
+            --shadow-hover: 0 20px 60px rgba(37, 101, 143, 0.2);
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
         }
 
         body {
-            background-image: url('https://www.groupe3architectes.com/wp-content/uploads/2020/06/1-18.webp');
-            background-size: cover;
-            background-position: center;
-            background-attachment: fixed;
-            font-family: 'Segoe UI', sans-serif;
-            margin: 0;
-            padding: 0;
+            font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+            background: #0f172a;
+            color: #e2e8f0;
+            overflow-x: hidden;
+        }
+
+        .dashboard-container {
+            display: flex;
+            min-height: 100vh;
+        }
+
+        /* Sidebar */
+        .sidebar {
+            width: 280px;
+            background: #1e293b;
+            border-right: 1px solid #334155;
+            position: fixed;
+            height: 100vh;
+            overflow-y: auto;
+            z-index: 1000;
+        }
+
+        .sidebar-header {
+            padding: 2rem 1.5rem;
+            border-bottom: 1px solid #334155;
+        }
+
+        .logo {
+            display: flex;
+            align-items: center;
+            gap: 0.75rem;
+        }
+
+        .logo-icon {
+            width: 40px;
+            height: 40px;
+            background: linear-gradient(135deg, #3b82f6, #1d4ed8);
+            border-radius: 10px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            font-size: 1.25rem;
+            font-weight: bold;
+        }
+
+        .logo-text {
+            font-size: 1.5rem;
+            font-weight: 700;
+            color: #f1f5f9;
+        }
+
+        .nav-section {
+            padding: 1rem 0;
+        }
+
+        .nav-title {
+            padding: 0 1.5rem 0.5rem;
+            font-size: 0.75rem;
+            font-weight: 600;
+            color: #64748b;
+            text-transform: uppercase;
+            letter-spacing: 0.05em;
+        }
+
+        .nav-item {
+            margin: 0.25rem 1rem;
+        }
+
+        .nav-link {
+            display: flex;
+            align-items: center;
+            gap: 0.75rem;
+            padding: 0.75rem 1rem;
+            color: #cbd5e1;
+            text-decoration: none;
+            border-radius: 8px;
+            transition: all 0.2s ease;
+            font-weight: 500;
+        }
+
+        .nav-link:hover {
+            background: #334155;
+            color: #f1f5f9;
+        }
+
+        .nav-link.active {
+            background: linear-gradient(135deg, #3b82f6, #1d4ed8);
+            color: white;
+        }
+
+        .nav-icon {
+            width: 20px;
+            text-align: center;
+        }
+
+        /* Main Content */
+        .main-content {
+            flex: 1;
+            margin-left: 280px;
+            background: #0f172a;
+        }
+
+        .header {
+            background: #1e293b;
+            border-bottom: 1px solid #334155;
+            padding: 1.5rem 2rem;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .header-left h1 {
+            font-size: 1.875rem;
+            font-weight: 700;
+            color: #f1f5f9;
+            margin-bottom: 0.25rem;
+        }
+
+        .header-left p {
+            color: #64748b;
+            font-size: 0.875rem;
+        }
+
+        .header-right {
+            display: flex;
+            align-items: center;
+            gap: 1rem;
+            margin-left: auto;
+        }
+
+        .search-box {
             position: relative;
         }
 
-        body::before {
-            content: '';
-            position: fixed;
-            top: 0; left: 0;
-            width: 100%; height: 100%;
-            background-color: rgba(0, 0, 0, 0.4);
-            z-index: -1;
+        .search-input {
+            background: #334155;
+            border: 1px solid #475569;
+            border-radius: 8px;
+            padding: 0.5rem 1rem 0.5rem 2.5rem;
+            color: #e2e8f0;
+            width: 300px;
+            font-size: 0.875rem;
         }
 
-        .main-container {
+        .search-input::placeholder {
+            color: #64748b;
+        }
+
+        .search-icon {
+            position: absolute;
+            left: 0.75rem;
+            top: 50%;
+            transform: translateY(-50%);
+            color: #64748b;
+        }
+
+        .user-menu {
+            display: flex;
+            align-items: center;
+            gap: 0.75rem;
+            padding: 0.5rem 1rem;
+            background: #334155;
+            border-radius: 8px;
+            cursor: pointer;
+            transition: background 0.2s ease;
+        }
+
+        .user-menu:hover {
+            background: #475569;
+        }
+
+        .user-avatar {
+            width: 32px;
+            height: 32px;
+            background: linear-gradient(135deg, #3b82f6, #1d4ed8);
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            font-weight: 600;
+            font-size: 0.875rem;
+        }
+
+        /* Dashboard Content */
+        .dashboard-content {
             padding: 2rem;
-            background-color: var(--light-overlay);
-            margin: 40px auto;
-            border-radius: var(--border-radius);
-            box-shadow: var(--shadow);
-            max-width: 900px;
         }
 
-        .section-title {
-            color: var(--primary-color);
-            font-weight: bold;
-            border-left: 5px solid var(--accent-color);
-            padding-left: 12px;
+        .metrics-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+            gap: 1.5rem;
             margin-bottom: 2rem;
         }
 
-        .intervention-card {
-            background-color: white;
-            border-radius: var(--border-radius);
+        .metric-card {
+            background: #1e293b;
+            border: 1px solid #334155;
+            border-radius: 12px;
             padding: 1.5rem;
-            box-shadow: var(--shadow);
-            margin-bottom: 1.5rem;
+            position: relative;
+            overflow: hidden;
         }
 
-        .btn-download {
-            display: inline-block;
-            padding: 8px 20px;
-            border-radius: 50px;
-            background-color: var(--primary-color);
-            color: white;
-            text-decoration: none;
-            transition: background-color 0.3s ease;
+        .metric-card::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            height: 4px;
+            background: var(--gradient);
         }
 
-        .btn-download:hover {
-            background-color: #1e4e6b;
+        .metric-card.revenue {
+            --gradient: linear-gradient(135deg, #10b981, #059669);
         }
 
-        h3, p {
+        .metric-card.orders {
+            --gradient: linear-gradient(135deg, #f59e0b, #d97706);
+        }
+
+        .metric-card.clients {
+            --gradient: linear-gradient(135deg, #ec4899, #be185d);
+        }
+
+        .metric-card.stock {
+            --gradient: linear-gradient(135deg, #3b82f6, #1d4ed8);
+        }
+
+        .metric-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: flex-start;
+            margin-bottom: 1rem;
+        }
+
+        .metric-title {
+            font-size: 0.875rem;
+            color: #94a3b8;
+            font-weight: 500;
+        }
+
+        .metric-icon {
+            width: 40px;
+            height: 40px;
+            border-radius: 8px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.25rem;
+        }
+
+        .metric-card.revenue .metric-icon {
+            background: rgba(16, 185, 129, 0.1);
+            color: #10b981;
+        }
+
+        .metric-card.orders .metric-icon {
+            background: rgba(245, 158, 11, 0.1);
+            color: #f59e0b;
+        }
+
+        .metric-card.clients .metric-icon {
+            background: rgba(236, 72, 153, 0.1);
+            color: #ec4899;
+        }
+
+        .metric-card.stock .metric-icon {
+            background: rgba(59, 130, 246, 0.1);
+            color: #3b82f6;
+        }
+
+        .metric-value {
+            font-size: 2rem;
+            font-weight: 700;
+            color: #f1f5f9;
             margin-bottom: 0.5rem;
         }
 
-        .no-data {
+        .metric-change {
+            font-size: 0.875rem;
+            color: #10b981;
+            display: flex;
+            align-items: center;
+            gap: 0.25rem;
+        }
+
+        .metric-change.negative {
+            color: #ef4444;
+        }
+
+        /* Charts Section */
+        .charts-grid {
+            display: grid;
+            grid-template-columns: 2fr 1fr;
+            gap: 2rem;
+            margin-bottom: 2rem;
+        }
+
+        .chart-card {
+            background: #1e293b;
+            border: 1px solid #334155;
+            border-radius: 12px;
+            padding: 1.5rem;
+        }
+
+        .chart-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 1.5rem;
+        }
+
+        .chart-title {
+            font-size: 1.125rem;
+            font-weight: 600;
+            color: #f1f5f9;
+        }
+
+        .chart-filter {
+            background: #334155;
+            border: 1px solid #475569;
+            border-radius: 6px;
+            padding: 0.5rem 1rem;
+            color: #e2e8f0;
+            font-size: 0.875rem;
+        }
+
+        .chart-container {
+            height: 300px;
+            position: relative;
+        }
+
+        .calendar-widget {
+            background: #1e293b;
+            border: 1px solid #334155;
+            border-radius: 12px;
+            padding: 1.5rem;
+        }
+
+        .calendar-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 1rem;
+        }
+
+        .calendar-title {
+            font-size: 1.125rem;
+            font-weight: 600;
+            color: #f1f5f9;
+        }
+
+        .calendar-nav {
+            display: flex;
+            gap: 0.5rem;
+        }
+
+        .calendar-nav button {
+            background: #334155;
+            border: none;
+            border-radius: 4px;
+            padding: 0.5rem;
+            color: #cbd5e1;
+            cursor: pointer;
+            transition: background 0.2s ease;
+        }
+
+        .calendar-nav button:hover {
+            background: #475569;
+        }
+
+        .calendar-grid {
+            display: grid;
+            grid-template-columns: repeat(7, 1fr);
+            gap: 0.25rem;
+        }
+
+        .calendar-day {
+            aspect-ratio: 1;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 0.875rem;
+            border-radius: 4px;
+            cursor: pointer;
+            transition: background 0.2s ease;
+        }
+
+        .calendar-day:hover {
+            background: #334155;
+        }
+
+        .calendar-day.today {
+            background: #3b82f6;
+            color: white;
+        }
+
+        .calendar-day.other-month {
+            color: #64748b;
+        }
+
+        /* Stats Cards */
+        .stats-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 1.5rem;
+        }
+
+        .stat-card {
+            background: #1e293b;
+            border: 1px solid #334155;
+            border-radius: 12px;
+            padding: 1.5rem;
             text-align: center;
-            color: #6c757d;
-            font-style: italic;
+        }
+
+        .stat-value {
+            font-size: 1.5rem;
+            font-weight: 700;
+            color: #f1f5f9;
+            margin-bottom: 0.5rem;
+        }
+
+        .stat-label {
+            font-size: 0.875rem;
+            color: #94a3b8;
+        }
+
+        /* Responsive */
+        @media (max-width: 1024px) {
+            .sidebar {
+                transform: translateX(-100%);
+                transition: transform 0.3s ease;
+            }
+
+            .sidebar.open {
+                transform: translateX(0);
+            }
+
+            .main-content {
+                margin-left: 0;
+            }
+
+            .charts-grid {
+                grid-template-columns: 1fr;
+            }
+        }
+
+        @media (max-width: 768px) {
+            .header {
+                padding: 1rem;
+            }
+
+            .dashboard-content {
+                padding: 1rem;
+            }
+
+            .search-input {
+                width: 200px;
+            }
+
+            .metrics-grid {
+                grid-template-columns: 1fr;
+            }
         }
     </style>
 </head>
 <body>
+    <div class="dashboard-container">
+        <!-- Sidebar -->
+        <aside class="sidebar">
+            <div class="sidebar-header">
+                <div class="logo">
+                    <div class="logo-icon">M</div>
+                    <div class="logo-text">MUNISYS</div>
+                </div>
+            </div>
 
-<div class="container main-container">
-    <h2 class="section-title"><i class="fas fa-tools"></i> Liste des interventions</h2>
+            <nav>
+                <div class="nav-section">
+                    <div class="nav-title">Navigation</div>
+                    <div class="nav-item">
+                        <a href="{% url 'adminn' %}" class="nav-link active">
+                            <i class="nav-icon fas fa-chart-line"></i>
+                            Dashboard
+                        </a>
+                    </div>
+                    <div class="nav-item">
+                        <a href="{% url 'notification_admin' %}" class="nav-link">
+                            <i class="nav-icon fas fa-bell"></i>
+                            Notifications
+                        </a>
+                    </div>
+                </div>
 
-    {% if interventions %}
-        {% for i in interventions %}
-        <div class="intervention-card">
-            <p><strong>Date :</strong> {{ i.date_ajout }}</p>
-            <p><strong>Rôle :</strong> {{ i.user.role }}</p>
-            <p><strong>Nom d'utilisateur :</strong> {{ i.user.username }}</p>
-            <p><strong>Email :</strong> {{ i.user.email }}</p>
-            <a href="?telecharger={{ i.id }}" class="btn-download"><i class="fas fa-file-download"></i> Télécharger la fiche</a>
-        </div>
-        {% endfor %}
-    {% else %}
-        <h3 class="no-data">Aucune intervention à afficher</h3>
-    {% endif %}
-</div>
+                <div class="nav-section">
+                    <div class="nav-title">Utilisateurs</div>
+                    <div class="nav-item">
+                        <a href="{% url 'new_user' %}" class="nav-link">
+                            <i class="nav-icon fas fa-user-plus"></i>
+                            Ajouter utilisateur
+                        </a>
+                    </div>
+                    <div class="nav-item">
+                        <a href="{% url 'lister_users' %}" class="nav-link">
+                            <i class="nav-icon fas fa-users"></i>
+                            Liste utilisateurs
+                        </a>
+                    </div>
+                    <div class="nav-item">
+                        <a href="{% url 'delete_user' %}" class="nav-link">
+                            <i class="nav-icon fas fa-user-times"></i>
+                            Supprimer utilisateur
+                        </a>
+                    </div>
+                </div>
 
+                <div class="nav-section">
+                    <div class="nav-title">Matériels</div>
+                    <div class="nav-item">
+                        <a href="{% url 'ajouter_mat' %}" class="nav-link">
+                            <i class="nav-icon fas fa-plus-circle"></i>
+                            Ajouter matériel
+                        </a>
+                    </div>
+                    <div class="nav-item">
+                        <a href="{% url 'lister_mat' %}" class="nav-link">
+                            <i class="nav-icon fas fa-list"></i>
+                            Liste matériels
+                        </a>
+                    </div>
+                    <div class="nav-item">
+                        <a href="{% url 'alerte' %}" class="nav-link">
+                            <i class="nav-icon fas fa-exclamation-triangle"></i>
+                            Alertes stock
+                        </a>
+                    </div>
+                    <div class="nav-item">
+                        <a href="{% url 'rupture_de_stocke' %}" class="nav-link">
+                            <i class="nav-icon fas fa-times-circle"></i>
+                            Ruptures de stock
+                        </a>
+                    </div>
+                </div>
+
+                <div class="nav-section">
+                    <div class="nav-title">Commandes</div>
+                    <div class="nav-item">
+                        <a href="{% url 'historique_commande_approuver' %}" class="nav-link">
+                            <i class="nav-icon fas fa-history"></i>
+                            Historique commandes
+                        </a>
+                    </div>
+                </div>
+
+                <div class="nav-section">
+                    <div class="nav-title">Système</div>
+                    <div class="nav-item">
+                        <a href="{% url 'import_users' %}" class="nav-link">
+                            <i class="nav-icon fas fa-upload"></i>
+                            Import utilisateurs
+                        </a>
+                    </div>
+                    <div class="nav-item">
+                        <a href="{% url 'import_clients' %}" class="nav-link">
+                            <i class="nav-icon fas fa-upload"></i>
+                            Import clients
+                        </a>
+                    </div>
+                    <div class="nav-item">
+                        <a href="{% url 'historique_intervention' %}" class="nav-link">
+                            <i class="nav-icon fas fa-file-alt"></i>
+                            Interventions
+                        </a>
+                    </div>
+                    <div class="nav-item">
+                        <a href="{% url 'logout' %}" class="nav-link">
+                            <i class="nav-icon fas fa-sign-out-alt"></i>
+                            Déconnexion
+                        </a>
+                    </div>
+                </div>
+            </nav>
+        </aside>
+
+        <!-- Main Content -->
+        <main class="main-content">
+            <header class="header">
+                <div class="header-left">
+                    <h1>Hello, Admin</h1>
+                    <p>Bienvenue sur votre tableau de bord Munisys</p>
+                </div>
+                <div class="header-right">
+                    <div class="search-box">
+                        <i class="search-icon fas fa-search"></i>
+                        <input type="text" class="search-input" placeholder="Rechercher...">
+                    </div>
+                    <div class="user-menu">
+                        <div class="user-avatar">AM</div>
+                        <span>Admin Munisys</span>
+                        <i class="fas fa-chevron-down"></i>
+                    </div>
+                </div>
+            </header>
+
+            <div class="dashboard-content">
+                <!-- Metrics Cards -->
+                <div class="metrics-grid">
+                    <div class="metric-card revenue">
+                        <div class="metric-header">
+                            <div>
+                                <div class="metric-title">Revenus Mensuels</div>
+                                <div class="metric-value">
+                                    {% if somme %}
+                                        { somme|floatformat:0 }k MAD
+                                    {% else %}
+                                        0k MAD
+                                    {% endif %}
+                                </div>
+                                <div class="metric-change">
+                                    <i class="fas fa-arrow-up"></i>
+                                    +12% vs mois dernier
+                                </div>
+                            </div>
+                            <div class="metric-icon">
+                                <i class="fas fa-dollar-sign"></i>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="metric-card orders">
+                        <div class="metric-header">
+                            <div>
+                                <div class="metric-title">Commandes en Cours</div>
+                                <div class="metric-value">
+                                    {% if en_attente %}
+                                        {{ en_attente }}
+                                    {% else %}
+                                        0
+                                    {% endif %}
+                                </div>
+                                <div class="metric-change">
+                                    <i class="fas fa-arrow-up"></i>
+                                    +8% cette semaine
+                                </div>
+                            </div>
+                            <div class="metric-icon">
+                                <i class="fas fa-shopping-cart"></i>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="metric-card clients">
+                        <div class="metric-header">
+                            <div>
+                                <div class="metric-title">Nouveaux Clients</div>
+                                <div class="metric-value">
+                                    {% if nouveau_users_ce_mois %}
+                                        {{ nouveau_users_ce_mois|length }}
+                                    {% else %}
+                                        0
+                                    {% endif %}
+                                </div>
+                                <div class="metric-change">
+                                    <i class="fas fa-arrow-up"></i>
+                                    +15% ce mois
+                                </div>
+                            </div>
+                            <div class="metric-icon">
+                                <i class="fas fa-users"></i>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="metric-card stock">
+                        <div class="metric-header">
+                            <div>
+                                <div class="metric-title">Stock Total</div>
+                                <div class="metric-value">
+                                    {% if somme %}
+                                        {{ somme }}
+                                    {% else %}
+                                        0
+                                    {% endif %}
+                                </div>
+                                <div class="metric-change">
+                                    <i class="fas fa-arrow-down"></i>
+                                    -3% vs mois dernier
+                                </div>
+                            </div>
+                            <div class="metric-icon">
+                                <i class="fas fa-boxes"></i>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Charts Section -->
+                <div class="charts-grid">
+                    <div class="chart-card">
+                        <div class="chart-header">
+                            <h3 class="chart-title">Ventes</h3>
+                            <select class="chart-filter">
+                                <option>2024</option>
+                                <option>2023</option>
+                            </select>
+                        </div>
+                        <div class="chart-container">
+                            <canvas id="salesChart"></canvas>
+                        </div>
+                    </div>
+
+                    <div class="calendar-widget">
+                        <div class="calendar-header">
+                            <h3 class="calendar-title">Calendrier</h3>
+                            <div class="calendar-nav">
+                                <button><i class="fas fa-chevron-left"></i></button>
+                                <button><i class="fas fa-chevron-right"></i></button>
+                            </div>
+                        </div>
+                        <div class="calendar-grid" id="calendar">
+                            <!-- Calendar will be generated by JavaScript -->
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Additional Stats -->
+                <div class="stats-grid">
+                    <div class="stat-card">
+                        <div class="stat-value">
+                            {% if total %}{{ total }}{% else %}0{% endif %}
+                        </div>
+                        <div class="stat-label">Total Commandes</div>
+                    </div>
+                    <div class="stat-card">
+                        <div class="stat-value">
+                            {% if nbr_actifs %}{{ nbr_actifs }}{% else %}0{% endif %}
+                        </div>
+                        <div class="stat-label">Utilisateurs Actifs</div>
+                    </div>
+                    <div class="stat-card">
+                        <div class="stat-value">
+                            {% if nombre_telechargement %}{{ nombre_telechargement }}{% else %}0{% endif %}
+                        </div>
+                        <div class="stat-label">Téléchargements</div>
+                    </div>
+                    <div class="stat-card">
+                        <div class="stat-value">
+                            {% if total_upload %}{{ total_upload }}{% else %}0{% endif %}
+                        </div>
+                        <div class="stat-label">Interventions</div>
+                    </div>
+                </div>
+            </div>
+        </main>
+    </div>
+
+    <script>
+        // Sales Chart
+        const ctx = document.getElementById('salesChart').getContext('2d');
+        const salesChart = new Chart(ctx, {
+            type: 'line',
+            data: {
+                labels: ['Jan', 'Fév', 'Mar', 'Avr', 'Mai', 'Jun', 'Jul', 'Aoû', 'Sep', 'Oct', 'Nov', 'Déc'],
+                datasets: [{
+                    label: 'Ventes',
+                    data: [30, 45, 35, 50, 49, 60, 70, 91, 125, 85, 95, 110],
+                    borderColor: '#3b82f6',
+                    backgroundColor: 'rgba(59, 130, 246, 0.1)',
+                    tension: 0.4,
+                    fill: true
+                }, {
+                    label: 'Revenus Annuels',
+                    data: [20, 35, 25, 40, 39, 50, 60, 81, 115, 75, 85, 100],
+                    borderColor: '#10b981',
+                    backgroundColor: 'rgba(16, 185, 129, 0.1)',
+                    tension: 0.4,
+                    fill: true
+                }]
+            },
+            options: {
+                responsive: true,
+                maintainAspectRatio: false,
+                plugins: {
+                    legend: {
+                        labels: {
+                            color: '#e2e8f0'
+                        }
+                    }
+                },
+                scales: {
+                    x: {
+                        ticks: {
+                            color: '#94a3b8'
+                        },
+                        grid: {
+                            color: '#334155'
+                        }
+                    },
+                    y: {
+                        ticks: {
+                            color: '#94a3b8'
+                        },
+                        grid: {
+                            color: '#334155'
+                        }
+                    }
+                }
+            }
+        });
+
+        // Calendar
+        function generateCalendar() {
+            const calendar = document.getElementById('calendar');
+            const today = new Date();
+            const currentMonth = today.getMonth();
+            const currentYear = today.getFullYear();
+            const firstDay = new Date(currentYear, currentMonth, 1).getDay();
+            const daysInMonth = new Date(currentYear, currentMonth + 1, 0).getDate();
+
+            // Days of week headers
+            const daysOfWeek = ['D', 'L', 'M', 'M', 'J', 'V', 'S'];
+            daysOfWeek.forEach(day => {
+                const dayElement = document.createElement('div');
+                dayElement.className = 'calendar-day';
+                dayElement.style.fontWeight = '600';
+                dayElement.style.color = '#64748b';
+                dayElement.textContent = day;
+                calendar.appendChild(dayElement);
+            });
+
+            // Empty cells for days before month starts
+            for (let i = 0; i < firstDay; i++) {
+                const emptyDay = document.createElement('div');
+                emptyDay.className = 'calendar-day other-month';
+                calendar.appendChild(emptyDay);
+            }
+
+            // Days of the month
+            for (let day = 1; day <= daysInMonth; day++) {
+                const dayElement = document.createElement('div');
+                dayElement.className = 'calendar-day';
+                if (day === today.getDate()) {
+                    dayElement.classList.add('today');
+                }
+                dayElement.textContent = day;
+                calendar.appendChild(dayElement);
+            }
+        }
+
+        // Initialize calendar
+        generateCalendar();
+
+        // Mobile sidebar toggle
+        function toggleSidebar() {
+            const sidebar = document.querySelector('.sidebar');
+            sidebar.classList.toggle('open');
+        }
+
+        // Add mobile menu button if needed
+        if (window.innerWidth <= 1024) {
+            const header = document.querySelector('.header');
+            const menuButton = document.createElement('button');
+            menuButton.innerHTML = '<i class="fas fa-bars"></i>';
+            menuButton.style.cssText = 'background: #334155; border: none; color: #e2e8f0; padding: 0.5rem; border-radius: 4px; cursor: pointer; margin-right: 1rem;';
+            menuButton.onclick = toggleSidebar;
+            header.insertBefore(menuButton, header.firstChild);
+        }
+    </script>
 </body>
 </html>

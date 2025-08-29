@@ -5,7 +5,26 @@ from django.contrib.auth.models import AbstractUser
 from django.db import models
 from django.utils import timezone
 
+from django.db import models
 
+class Produit(models.Model):
+    nom = models.CharField(max_length=100)
+    prix = models.DecimalField(max_digits=10, decimal_places=2)
+
+class LigneCommande(models.Model):
+    produit = models.ForeignKey(Produit, on_delete=models.CASCADE)
+    quantite = models.IntegerField()
+
+class Commande(models.Model):
+    lignes = models.ManyToManyField(LigneCommande)
+
+    @property
+    def total_price(self):
+        """Calcule le prix total de la commande"""
+        total = 0
+        for ligne in self.lignes.all():
+            total += ligne.produit.prix * ligne.quantite
+        return total
 class Categorie(models.Model):
     nom=models.CharField(max_length=100)
 
@@ -46,8 +65,6 @@ class Commande(models.Model):
     date_commande = models.DateTimeField(default=timezone.now)
     statut = models.CharField(max_length=100, default='en attente')
     comerciale=models.ForeignKey(CustomUser, on_delete=models.CASCADE)
-    date_limite=models.DateTimeField(default=timezone.now,null=True,blank=True)
-    penalite=models.FloatField(blank=True,null=True)
 
 class Installation(models.Model):
     technicien = models.ForeignKey(CustomUser, on_delete=models.CASCADE)

@@ -1,0 +1,169 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <title>Mes devis - Munisys</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet">
+    <style>
+        body {
+            background: linear-gradient(135deg, #f5f7fa 0%, #c3cfe2 100%);
+            font-family: 'Segoe UI', sans-serif;
+            min-height: 100vh;
+        }
+
+        .navbar {
+            background: linear-gradient(135deg, #4A90A4 0%, #8F2565 100%);
+            padding: 1rem 2rem;
+            box-shadow: 0 4px 15px rgba(0,0,0,0.1);
+        }
+
+        .container {
+            max-width: 1000px;
+            margin: 40px auto;
+            padding: 0 20px;
+        }
+
+        .devis-card {
+            background: white;
+            border-radius: 15px;
+            padding: 25px;
+            margin-bottom: 20px;
+            box-shadow: 0 8px 25px rgba(0,0,0,0.1);
+            transition: transform 0.3s ease;
+        }
+
+        .devis-card:hover {
+            transform: translateY(-5px);
+        }
+
+        .status-badge {
+            padding: 8px 15px;
+            border-radius: 20px;
+            font-weight: 600;
+            font-size: 0.9rem;
+        }
+
+        .status-envoye {
+            background: #fff3cd;
+            color: #856404;
+        }
+
+        .status-accepte {
+            background: #d1edff;
+            color: #0c5460;
+        }
+
+        .status-refuse {
+            background: #f8d7da;
+            color: #721c24;
+        }
+
+        .btn-action {
+            padding: 10px 20px;
+            border-radius: 8px;
+            text-decoration: none;
+            font-weight: 600;
+            margin: 5px;
+            display: inline-block;
+            transition: all 0.3s ease;
+        }
+
+        .btn-accepter {
+            background: #28a745;
+            color: white;
+        }
+
+        .btn-refuser {
+            background: #dc3545;
+            color: white;
+        }
+
+        .btn-voir {
+            background: #17a2b8;
+            color: white;
+        }
+    </style>
+</head>
+<body>
+
+<nav class="navbar">
+    <div class="brand">
+        <a href="{% url 'dashboard_client' %}" style="color: white; text-decoration: none; font-size: 1.8rem; font-weight: bold;">MUNISYS</a>
+    </div>
+</nav>
+
+<div class="container">
+    <div class="text-center mb-5">
+        <h2 style="color: #4A90A4;">
+            <i class="fas fa-file-invoice-dollar me-3"></i>
+            Mes devis
+        </h2>
+    </div>
+
+    {% if devis %}
+        {% for commande in devis %}
+            <div class="devis-card">
+                <div class="d-flex justify-content-between align-items-start mb-3">
+                    <h5>Devis #{{ commande.id }}</h5>
+                    <span class="status-badge status-{{ commande.statut|slice:'6:' }}">
+                        {% if commande.statut == 'devis_envoye' %}
+                            En attente de réponse
+                        {% elif commande.statut == 'devis_accepte' %}
+                            Accepté
+                        {% elif commande.statut == 'devis_refuse' %}
+                            Refusé
+                        {% endif %}
+                    </span>
+                </div>
+
+                <div class="row mb-3">
+                    <div class="col-md-6">
+                        <p><i class="fas fa-calendar me-2"></i><strong>Date :</strong> {{ commande.date_devis|date:"d/m/Y H:i" }}</p>
+                        <p><i class="fas fa-user-tie me-2"></i><strong>Commercial :</strong> {{ commande.comerciale.get_full_name }}</p>
+                    </div>
+                    <div class="col-md-6">
+                        {% if commande.prix_total_negocie %}
+                            <p><i class="fas fa-euro-sign me-2"></i><strong>Montant :</strong> {{ commande.prix_total_negocie }} MAD</p>
+                        {% endif %}
+                        {% if commande.remise_globale > 0 %}
+                            <p><i class="fas fa-percentage me-2"></i><strong>Remise :</strong> {{ commande.remise_globale }}%</p>
+                        {% endif %}
+                    </div>
+                </div>
+
+                {% if commande.commentaire_commercial %}
+                    <div class="alert alert-info">
+                        <i class="fas fa-comment me-2"></i>
+                        <strong>Message du commercial :</strong> {{ commande.commentaire_commercial }}
+                    </div>
+                {% endif %}
+
+                <div class="text-end">
+                    {% if commande.statut == 'devis_envoye' %}
+                        <a href="{% url 'repondre_devis' commande.id %}" class="btn-action btn-voir">
+                            <i class="fas fa-eye me-2"></i>Voir le devis
+                        </a>
+                    {% elif commande.statut == 'devis_accepte' %}
+                        <span class="text-success">
+                            <i class="fas fa-check-circle me-2"></i>Devis accepté - Commande en cours de traitement
+                        </span>
+                    {% elif commande.statut == 'devis_refuse' %}
+                        <span class="text-danger">
+                            <i class="fas fa-times-circle me-2"></i>Devis refusé
+                        </span>
+                    {% endif %}
+                </div>
+            </div>
+        {% endfor %}
+    {% else %}
+        <div class="text-center py-5">
+            <i class="fas fa-inbox" style="font-size: 4rem; color: #ddd;"></i>
+            <h4 class="mt-3">Aucun devis</h4>
+            <p class="text-muted">Vous n'avez pas encore reçu de devis.</p>
+        </div>
+    {% endif %}
+</div>
+
+</body>
+</html>

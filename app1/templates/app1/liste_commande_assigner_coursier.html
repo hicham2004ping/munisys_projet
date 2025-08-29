@@ -112,7 +112,6 @@
                 <p><strong>Téléphone :</strong> {{ c.Commande.client.telephone }}</p>
                 <p><strong>Email :</strong> {{ c.Commande.client.email }}</p>
                 <p><strong>Date commande :</strong> {{ c.Commande.date_commande }}</p>
-
                 {% if c.Commande.statut == 'preparation_terminer' %}
                 <a href="?expediter={{c.Commande.id}}">Expediter</a>
                 {% endif %}

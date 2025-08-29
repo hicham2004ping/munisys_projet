@@ -2,19 +2,21 @@
 <html lang="fr">
 <head>
     <meta charset="UTF-8">
-    <title>Dashboard Technicien - Munisys</title>
+    <title>Dashboard Coursier - Munisys</title>
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
     <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet">
     <style>
         :root {
-            --munisys-teal: #4A90A4;
-            --munisys-magenta: #8F2565;
-            --munisys-light-teal: #6BA5B8;
-            --munisys-dark-teal: #3A7A8A;
-            --munisys-light-magenta: #A64B7A;
-            --gradient-primary: linear-gradient(135deg, var(--munisys-teal) 0%, var(--munisys-magenta) 100%);
-            --gradient-tech: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-            --gradient-tools: linear-gradient(135deg, #f093fb 0%, #f5576c 100%);
+            --primary-color: #2563eb;
+            --secondary-color: #1e40af;
+            --success-color: #059669;
+            --warning-color: #d97706;
+            --danger-color: #dc2626;
+            --dark-color: #1f2937;
+            --light-color: #f8fafc;
+            --gradient-primary: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            --gradient-delivery: linear-gradient(135deg, #f093fb 0%, #f5576c 100%);
+            --gradient-logistics: linear-gradient(135deg, #4facfe 0%, #00f2fe 100%);
         }
 
         * {
@@ -24,8 +26,8 @@
         }
 
         body {
-            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
+            background: var(--gradient-primary);
             min-height: 100vh;
             position: relative;
         }
@@ -37,7 +39,7 @@
             left: 0;
             width: 100%;
             height: 100%;
-            background: url('data:image/svg+xml,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100"><defs><pattern id="tech" width="40" height="40" patternUnits="userSpaceOnUse"><rect x="15" y="15" width="10" height="10" fill="rgba(255,255,255,0.1)" rx="2"/><circle cx="10" cy="30" r="2" fill="rgba(255,255,255,0.1)"/><circle cx="30" cy="10" r="2" fill="rgba(255,255,255,0.1)"/></pattern></defs><rect width="100" height="100" fill="url(%23tech)"/></svg>');
+            background: url('data:image/svg+xml,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100"><defs><pattern id="delivery" width="50" height="50" patternUnits="userSpaceOnUse"><path d="M10 10h30v30h-30z" fill="none" stroke="rgba(255,255,255,0.1)" stroke-width="1"/><circle cx="25" cy="25" r="3" fill="rgba(255,255,255,0.1)"/></pattern></defs><rect width="100" height="100" fill="url(%23delivery)"/></svg>');
             z-index: -1;
         }
 
@@ -60,7 +62,7 @@
         }
 
         .navbar-brand {
-            color: var(--munisys-dark-teal) !important;
+            color: var(--dark-color) !important;
             font-weight: 800;
             font-size: 2rem;
             letter-spacing: -1px;
@@ -74,21 +76,21 @@
         }
 
         .nav-actions a {
-            color: var(--munisys-dark-teal) !important;
+            color: var(--dark-color) !important;
             font-weight: 500;
             text-decoration: none;
             padding: 0.75rem 1.25rem;
             border-radius: 12px;
             transition: all 0.3s ease;
-            background: rgba(102, 126, 234, 0.1);
-            border: 1px solid rgba(102, 126, 234, 0.2);
+            background: rgba(37, 99, 235, 0.1);
+            border: 1px solid rgba(37, 99, 235, 0.2);
         }
 
         .nav-actions a:hover {
-            background: var(--gradient-tech);
+            background: var(--gradient-primary);
             color: white !important;
             transform: translateY(-2px);
-            box-shadow: 0 4px 15px rgba(102, 126, 234, 0.3);
+            box-shadow: 0 4px 15px rgba(37, 99, 235, 0.3);
         }
 
         .main-container {
@@ -117,24 +119,13 @@
             left: 0;
             right: 0;
             height: 6px;
-            background: var(--gradient-tech);
-        }
-
-        .welcome-header::after {
-            content: '';
-            position: absolute;
-            top: -50%;
-            right: -50%;
-            width: 100%;
-            height: 100%;
-            background: radial-gradient(circle, rgba(102, 126, 234, 0.1) 0%, transparent 70%);
-            pointer-events: none;
+            background: var(--gradient-delivery);
         }
 
         .welcome-title {
             font-size: 2.5rem;
             font-weight: 800;
-            background: var(--gradient-tech);
+            background: var(--gradient-delivery);
             -webkit-background-clip: text;
             -webkit-text-fill-color: transparent;
             background-clip: text;
@@ -173,7 +164,7 @@
             left: 0;
             right: 0;
             height: 4px;
-            background: var(--gradient-tech);
+            background: var(--gradient-delivery);
         }
 
         .tool-category:hover {
@@ -193,12 +184,12 @@
             width: 60px;
             height: 60px;
             border-radius: 16px;
-            background: var(--gradient-tech);
+            background: var(--gradient-delivery);
             display: flex;
             align-items: center;
             justify-content: center;
             margin-right: 1rem;
-            box-shadow: 0 8px 20px rgba(102, 126, 234, 0.3);
+            box-shadow: 0 8px 20px rgba(240, 147, 251, 0.3);
         }
 
         .category-icon i {
@@ -209,7 +200,7 @@
         .category-title {
             font-size: 1.4rem;
             font-weight: 700;
-            color: var(--munisys-dark-teal);
+            color: var(--dark-color);
             margin: 0;
         }
 
@@ -219,7 +210,7 @@
             padding: 1rem 1.5rem;
             margin-bottom: 1rem;
             background: linear-gradient(135deg, #f8fafc 0%, #e2e8f0 100%);
-            color: var(--munisys-dark-teal);
+            color: var(--dark-color);
             text-decoration: none;
             border-radius: 12px;
             font-weight: 600;
@@ -236,7 +227,7 @@
             left: -100%;
             width: 100%;
             height: 100%;
-            background: var(--gradient-tech);
+            background: var(--gradient-delivery);
             transition: left 0.3s ease;
             z-index: -1;
         }
@@ -244,7 +235,7 @@
         .tool-button:hover {
             color: white;
             transform: translateY(-2px);
-            box-shadow: 0 8px 25px rgba(102, 126, 234, 0.3);
+            box-shadow: 0 8px 25px rgba(240, 147, 251, 0.3);
         }
 
         .tool-button:hover::before {
@@ -272,7 +263,7 @@
         .stats-title {
             font-size: 1.5rem;
             font-weight: 700;
-            color: var(--munisys-dark-teal);
+            color: var(--dark-color);
             margin-bottom: 1.5rem;
             text-align: center;
         }
@@ -288,7 +279,7 @@
             padding: 1.5rem;
             background: linear-gradient(135deg, #f8fafc 0%, #e2e8f0 100%);
             border-radius: 16px;
-            border: 1px solid rgba(102, 126, 234, 0.1);
+            border: 1px solid rgba(240, 147, 251, 0.1);
             transition: all 0.3s ease;
         }
 
@@ -301,7 +292,7 @@
             width: 50px;
             height: 50px;
             border-radius: 12px;
-            background: var(--gradient-tech);
+            background: var(--gradient-delivery);
             display: flex;
             align-items: center;
             justify-content: center;
@@ -316,7 +307,7 @@
         .stat-number {
             font-size: 1.8rem;
             font-weight: 800;
-            color: var(--munisys-dark-teal);
+            color: var(--dark-color);
             margin-bottom: 0.5rem;
         }
 
@@ -370,11 +361,8 @@
 
 <nav class="navbar">
     <div class="container">
-        <a class="navbar-brand" href="{% url 'technicien_dashboard' %}">MUNISYS</a>
+        <a class="navbar-brand" href="{% url 'coursier_dashboard' %}">MUNISYS</a>
         <div class="nav-actions">
-            <a href="{% url 'notifications_technicien' %}">
-                <i class="fas fa-bell me-2"></i>Notifications
-            </a>
             <a href="{% url 'logout' %}">
                 <i class="fas fa-sign-out-alt me-2"></i>Déconnexion
             </a>
@@ -384,24 +372,24 @@
 
 <div class="main-container">
     <div class="welcome-header">
-        <h1 class="welcome-title">Espace Technicien</h1>
-        <p class="welcome-subtitle">Gérez vos interventions et maintenances techniques</p>
+        <h1 class="welcome-title">Espace Coursier</h1>
+        <p class="welcome-subtitle">Gérez vos livraisons et expéditions</p>
     </div>
 
     <div class="tools-grid">
         <div class="tool-category">
             <div class="category-header">
                 <div class="category-icon">
-                    <i class="fas fa-tools"></i>
+                    <i class="fas fa-truck"></i>
                 </div>
-                <h3 class="category-title">Gestion du Matériel</h3>
+                <h3 class="category-title">Livraisons</h3>
             </div>
             <div class="category-body">
-                <a href="{% url 'consulter_materielle' %}" class="tool-button">
-                    <i class="fas fa-clipboard-list"></i>Effectuer un mouvement
+                <a href="{% url 'commande_coursier' %}" class="tool-button">
+                    <i class="fas fa-list-alt"></i>Commandes assignées
                 </a>
-                <a href="{% url 'historique_mouvements' %}" class="tool-button">
-                    <i class="fas fa-history"></i>Historique des mouvements
+                <a href="{% url 'temps_ecoule_coursier' %}" class="tool-button">
+                    <i class="fas fa-clock"></i>Temps restant livraisons
                 </a>
             </div>
         </div>
@@ -409,19 +397,16 @@
         <div class="tool-category">
             <div class="category-header">
                 <div class="category-icon">
-                    <i class="fas fa-wrench"></i>
+                    <i class="fas fa-route"></i>
                 </div>
-                <h3 class="category-title">Interventions</h3>
+                <h3 class="category-title">Itinéraires</h3>
             </div>
             <div class="category-body">
-                <a href="{% url 'technicien_commande_concerner' %}" class="tool-button">
-                    <i class="fas fa-tasks"></i>Mes interventions
+                <a href="#" class="tool-button">
+                    <i class="fas fa-map-marked-alt"></i>Planifier itinéraire
                 </a>
-                <a href="{% url 'commande_installer' %}" class="tool-button">
-                    <i class="fas fa-cogs"></i>Installations à effectuer
-                </a>
-                <a href="{% url 'historique_installations' %}" class="tool-button">
-                    <i class="fas fa-check-circle"></i>Historique installations
+                <a href="#" class="tool-button">
+                    <i class="fas fa-history"></i>Historique des livraisons
                 </a>
             </div>
         </div>
@@ -429,57 +414,51 @@
         <div class="tool-category">
             <div class="category-header">
                 <div class="category-icon">
-                    <i class="fas fa-box"></i>
+                    <i class="fas fa-clipboard-check"></i>
                 </div>
-                <h3 class="category-title">Préparation</h3>
+                <h3 class="category-title">Suivi</h3>
             </div>
             <div class="category-body">
-                <a href="{% url 'commande_preparer' %}" class="tool-button">
-                    <i class="fas fa-package"></i>Commandes à préparer
+                <a href="#" class="tool-button">
+                    <i class="fas fa-barcode"></i>Scanner colis
                 </a>
-                <a href="{% url 'fiche_intervention' %}" class="tool-button">
-                    <i class="fas fa-file-download"></i>Télécharger fiche d'intervention
-                </a>
-                <a href="{% url 'upload_intervention' %}" class="tool-button">
-                    <i class="fas fa-upload"></i>Uploader intervention
-                </a>
-                <a href="{% url 'temps_ecoule_technicien' %}" class="tool-button">
-                    <i class="fas fa-clock"></i>Temps restant commandes
+                <a href="#" class="tool-button">
+                    <i class="fas fa-signature"></i>Confirmation livraison
                 </a>
             </div>
         </div>
     </div>
 
     <div class="stats-section">
-        <h3 class="stats-title">Statistiques de performance</h3>
+        <h3 class="stats-title">Statistiques de livraison</h3>
         <div class="stats-grid">
             <div class="stat-item">
                 <div class="stat-icon">
-                    <i class="fas fa-clipboard-check"></i>
+                    <i class="fas fa-shipping-fast"></i>
                 </div>
-                <div class="stat-number">8</div>
-                <div class="stat-label">Interventions du jour</div>
+                <div class="stat-number">12</div>
+                <div class="stat-label">Livraisons du jour</div>
             </div>
             <div class="stat-item">
                 <div class="stat-icon">
                     <i class="fas fa-clock"></i>
                 </div>
-                <div class="stat-number">3</div>
+                <div class="stat-number">5</div>
                 <div class="stat-label">En cours</div>
             </div>
             <div class="stat-item">
                 <div class="stat-icon">
-                    <i class="fas fa-check-double"></i>
+                    <i class="fas fa-check-circle"></i>
                 </div>
-                <div class="stat-number">15</div>
+                <div class="stat-number">45</div>
                 <div class="stat-label">Terminées cette semaine</div>
             </div>
             <div class="stat-item">
                 <div class="stat-icon">
-                    <i class="fas fa-star"></i>
+                    <i class="fas fa-tachometer-alt"></i>
                 </div>
-                <div class="stat-number">4.9</div>
-                <div class="stat-label">Note satisfaction</div>
+                <div class="stat-number">98%</div>
+                <div class="stat-label">Taux de réussite</div>
             </div>
         </div>
     </div>
