@@ -31,7 +31,7 @@
             {% csrf_token %}
             <div class="mb-3">
                 <label class="form-label">Nom d'utilisateur</label>
-                <input type="text" class="form-control" name="username" value="{{ user.username }}" readonly>
+                <input type="text" class="form-control" name="username" value="{{ user.username }}">
             </div>
 
             <div class="mb-3">
@@ -48,12 +48,10 @@
                 <label class="form-label">Nom</label>
                 <input type="text" class="form-control" name="last_name" value="{{ user.last_name }}" required>
             </div>
-
             <div class="form-check mb-3">
                 <input class="form-check-input" type="checkbox" name="is_staff" {% if user.is_staff %}checked{% endif %}>
                 <label class="form-check-label">Membre de staff (admin)</label>
             </div>
-
             <button type="submit" class="btn btn-primary w-100">Modifier l'utilisateur</button>
         </form>
     </div>

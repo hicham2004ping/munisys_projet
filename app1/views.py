@@ -7,7 +7,7 @@ from django.contrib.auth.decorators import login_required
 from django.http import HttpResponse, HttpResponseNotFound
 from django.contrib import messages
 from app1.models import Categorie, Responsabilite, Materiel, Mouvement, Client, LigneDeCommande, Commande, Notification, \
-    Installation, AffectationUtilisateur, PreparerCommande, CoursierCommande, ClienCommandeAvis
+    Installation, AffectationUtilisateur, PreparerCommande, CoursierCommande, ClienCommandeAvis,UserInterventino
 from django.shortcuts import render, redirect, get_object_or_404
 from app1.models import CustomUser
 from random import choice
@@ -25,10 +25,8 @@ import sqlalchemy
 import os
 from django.http import Http404
 
-
 def welcomeview(request):
     return render(request, "app1/acceuille.html")
-
 
 def login_view(request):
     if request.method == "POST":
@@ -56,7 +54,6 @@ def login_view(request):
         else:
             return redirect("login")
     return render(request, "app1/login.html")
-
 
 @login_required
 def admin_dashboard(request):
@@ -86,7 +83,6 @@ def admin_dashboard(request):
         "en_attente": en_attente,
     })
 
-
 @login_required
 def ajouter_nouveau_user(request):
     if request.method == "POST":
@@ -112,7 +108,6 @@ def ajouter_nouveau_user(request):
 
     return render(request, "app1/nouveau_user.html")
 
-
 @login_required
 def supprimer_user(request):
     if request.method == "POST":
@@ -126,18 +121,19 @@ def supprimer_user(request):
             return HttpResponseNotFound("L'utilisateur est introuvable.")
     return render(request, "app1/supprimer_user.html")
 
-
 @login_required
 def lister_users(request):
     users = CustomUser.objects.all()
     return render(request, "app1/liste_des_users.html", {'users': users})
 
-
 @login_required
 def modifier_user(request, id):
     user = get_object_or_404(CustomUser, id=id)
+    print(user)
     if request.method == "POST":
         user.email = request.POST.get('email')
+        user.username=request.POST.get('username')
+        print(user.username)
         user.first_name = request.POST.get('first_name')
         user.last_name = request.POST.get('last_name')
         user.role = request.POST.get('role')
@@ -146,17 +142,14 @@ def modifier_user(request, id):
         return redirect('lister_users')
     return render(request, "app1/modifier_user.html", {"user": user})
 
-
 @login_required
 def consulter_materielle(request):
     materiels = Materiel.objects.all()
     return render(request, "app1/consulter_materielle_user.html", {"materiels": materiels})
 
-
 @login_required
 def dashboard_user(request):
     return render(request, "app1/utilisateur_normale_dashboard.html")
-
 
 @login_required
 def ajouter_mouvement(request, id):
@@ -194,7 +187,6 @@ def ajouter_mouvement(request, id):
 
     return render(request, "app1/ajouter_mouvement.html", {'materiel': materiel})
 
-
 @login_required
 def historqiue_mouvement(request):
     with connection.cursor() as cursor:
@@ -209,10 +201,8 @@ def historqiue_mouvement(request):
     colonnes = ['ID', 'Date', 'Type', 'Quantité', 'Matériel', 'Utilisateur']
     return render(request, "app1/historique.html", {"mouvements": mouvements, "colonnes": colonnes})
 
-
 def a_propos_du_site(request):
     return render(request, "app1/a_propos_du_site.html")
-
 
 def sign_up_client(request):
     if request.method == "POST":
@@ -263,7 +253,6 @@ def sign_up_client(request):
         return render(request, "app1/creer_compte_client.html", context)
 
     return render(request, "app1/creer_compte_client.html")
-
 
 @login_required
 def consulter_materiel(request):
@@ -407,16 +396,13 @@ def liste_commande_assinger(request):
     return render(request, "app1/liste_commande_assigner.html",
                   {"liste_commande": liste_commande})
 
-
 @login_required
 def historique_commande_passe(request):
     commandes = Commande.objects.select_related("client").filter(
         comerciale_id=request.user.id,
-        statut="approuver",
+        statut__in=["valider","livrer","expediter","installer","preparation_terminer"],
     )
     return render(request, "app1/historique_commande_comerciale.html", {"commandes": commandes})
-
-
 @login_required
 def dashboard_client(request):
     return render(request, "app1/dashboard_client.html")
@@ -517,12 +503,12 @@ def passer_commande(request):
         try:
             client = Client.objects.get(email=request.user.username)
             commercial_assigne = get_suivant("commercial")
+            print(commercial_assigne)
             commande = Commande.objects.create(
                 client=client,
                 statut='en_attente',
                 comerciale=commercial_assigne,
             )
-
             somme = 0
             for id, qte in panier.items():
                 produit = Materiel.objects.get(id=id)
@@ -552,11 +538,10 @@ def passer_commande(request):
                     message=f"Nouvelle commande du client {client.email}, numéro: {client.telephone}, le prix total de la commande est {somme}",
                     lu=False
                 )
-
                 Notification.objects.create(
                     destinataire=request.user,
                     titre="Commande",
-                    message="Votre commande est en cours de traitement",
+                    message=f"Votre commande d'id {commande.id} est en cours de traitement",
                     lu=False
                 )
 
@@ -657,7 +642,6 @@ def telecharger_recue(request, id):
 
     return FileResponse(buf, as_attachment=True, filename=f"commande_{commande.id}.pdf")
 
-
 @login_required
 def ajouter_materiel(request):
     categorie = Categorie.objects.all()
@@ -684,12 +668,10 @@ def ajouter_materiel(request):
 
     return render(request, "app1/ajouter_materielle.html", {"categorie": categorie})
 
-
 @login_required
 def lister_materiel(request):
     materiels = Materiel.objects.all()
     return render(request, "app1/lister_materielle.html", {"materiels": materiels})
-
 
 @login_required
 def modifier_materiel(request, id):
@@ -709,9 +691,7 @@ def modifier_materiel(request, id):
         materiel.image = image
         materiel.save()
         return redirect('adminn')
-
     return render(request, "app1/modifier_materiel.html", {"materiel": materiel})
-
 
 @login_required
 def supprimer_materiel(request):
@@ -781,19 +761,16 @@ def technicien_commande_concerner(request):
     installations = Installation.objects.filter(statut='en cours', technicien=request.user)
     return render(request, "app1/technicien_concerner.html", {"installations": installations})
 
-
 @login_required
 def historique_commande_concerner_technicien(request):
     installations = Installation.objects.filter(technicien=request.user, statut='confirmer')
     return render(request, "app1/historique_commande_installer.html", {"installations": installations})
-
 
 @login_required
 def technicien_hstoriqeu_mouvements(request):
     mvmts = Mouvement.objects.filter(effectuer_par=request.user)
     print(mvmts)
     return render(request, "app1/technicien_historique_mouvements.html", {"mvmts": mvmts})
-
 
 @login_required
 def liste_des_produits_depasser_seuil_min(request):
@@ -807,7 +784,6 @@ def liste_des_produits_depasser_seuil_min(request):
         produits = cursor.fetchall()
         print(produits)
     return render(request, "app1/liste_prdouit_depasser_seuille_min.html", {"produits": produits})
-
 
 def get_suivant(role):
     users = list(CustomUser.objects.filter(role=role).order_by('id'))
@@ -827,7 +803,6 @@ def get_suivant(role):
     setattr(suivi, f'dernier_{role}', suivant)
     suivi.save()
     return suivant
-
 
 @login_required
 def liste_commande_a_traiter(request):
@@ -875,7 +850,6 @@ def liste_commande_a_traiter(request):
     commandes = Commande.objects.filter(statut="en_attente").select_related("client", "comerciale")
     return render(request, "app1/liste_commande_a_traiter.html", {"commandes": commandes})
 
-
 @login_required
 def historique_commande_finaliser(request):
     commandes = Commande.objects.filter(statut="finaliser")
@@ -898,22 +872,19 @@ def historique_commande_finaliser(request):
         })
     return render(request, "app1/historique_commande.html", {"commandes_data": commandes_data})
 
-
 @login_required
 def searched(request):
     if request.method == "POST":
         chercher = request.POST.get("chercher")
         produit = Materiel.objects.filter(nom__icontains=chercher)
-        return render(request, "app1/templates/app1/search.html", {"produit": produit})
+        return render(request, "app1/search.html", {"produit": produit})
     else:
         return render(request, "app1/search.html")
-
 
 @login_required
 def produit_en_rupture_de_stocke(request):
     produits = Materiel.objects.filter(quantite_stock=0)
     return render(request, "app1/rupture_de_stock.html", {"produits": produits})
-
 
 @login_required
 def preparer_commande_technicien(request):
@@ -988,11 +959,9 @@ def preparer_commande_technicien(request):
             "commandes_infos": commandes_infos
         })
 
-
 @login_required
 def dashbaord_coursier(request):
     return render(request, "app1/dashboard_coursier_moderne.html")
-
 
 @login_required
 def liste_commande_assinger_coursier(request):
@@ -1044,7 +1013,6 @@ def liste_commande_assinger_coursier(request):
         commandes = CoursierCommande.objects.filter(coursier=request.user)
         return render(request, "app1/liste_commande_assigner_coursier.html", {"commandes": commandes})
 
-
 @login_required
 def liste_commandes_finsaliser_commerciale(request):
     if "finaliser" in request.GET:
@@ -1068,7 +1036,6 @@ def liste_commandes_finsaliser_commerciale(request):
         print(commandes)
         return render(request, "app1/liste_commande_finaliser_commerciale.html", {"commandes": commandes})
 
-
 @login_required
 def commande_a_installer_technicien(request):
     if "installer" in request.GET:
@@ -1089,7 +1056,6 @@ def commande_a_installer_technicien(request):
             installation__technicien=request.user
         )
         return render(request, "app1/commande_a_installer_technicien.html", {"commandes": commandes})
-
 
 @login_required
 def telecharger_recue2(request, id):
@@ -1180,12 +1146,10 @@ def telecharger_recue2(request, id):
 
     return FileResponse(buf, as_attachment=True, filename=f"commande_{commande.id}.pdf")
 
-
 @login_required
 def avis_client_sur_commande(request):
     avis = ClienCommandeAvis.objects.filter(commande__comerciale=request.user)
     return render(request, "app1/avis_client_commande.html", {"avis": avis})
-
 
 @login_required
 def fichier_intervention(request):
@@ -1260,7 +1224,9 @@ def uploader_fiche_intervention(request):
         types_acceptes = ["image/jpeg", "image/jpg", "image/png", "application/pdf"]
         max_taille = 5 * 1024 * 1024
         if type_mime in types_acceptes and fichier.size <= max_taille:
-            # Créer l'intervention ici si le modèle existe
+            k=UserInterventino.objects.create(
+                fichier=fichier,
+                user=utilisateur)
             if utilisateur.role == "technicien":
                 return redirect('technicien_dashboard')
             elif utilisateur.role == "commercial":
@@ -1276,9 +1242,15 @@ def uploader_fiche_intervention(request):
 
 @login_required
 def historique_intervention(request):
-    # Placeholder pour l'historique des interventions
-    return render(request, "app1/admin_visualier_intervention.html", {"interventions": []})
-
+    if 'telecharger' in request.GET:
+        idd = request.GET.get('telecharger')
+        intervention = UserInterventino.objects.get(id=idd)
+        fichier_path = os.path.join("media", f"{intervention.fichier}")
+        if not os.path.exists(fichier_path):
+            raise Http404("Fichier introuvable.")
+        return FileResponse(open(fichier_path, 'rb'), as_attachment=True, filename=f"{intervention.fichier}")
+    interventions = UserInterventino.objects.all()
+    return render(request, "app1/admin_visualier_intervention.html", {"interventions": interventions})
 
 @login_required
 def nombre_intervention_par_user(request):
@@ -1371,7 +1343,6 @@ def temps_ecoule_avant_date_limiter_technicien(request):
         })
     return render(request, "app1/templates/app1/temps_ecouler_technicien.html", {"commandes_infos": commandes_infos})
 
-
 @login_required
 def import_users(request):
     if request.method == "POST":
@@ -1396,7 +1367,6 @@ def import_users(request):
             return HttpResponse('aucun fichier na ete choisis')
     return render(request, 'app1/uploader_csv_users.html')
 
-
 @login_required
 def import_clients(request):
     if request.method == "POST":
@@ -1420,7 +1390,6 @@ def import_clients(request):
         else:
             return HttpResponse('aucun fichier na ete choisis')
     return render(request, 'app1/uploader_csv_client.html')
-
 
 @login_required
 def import_commandes(request):
@@ -1505,7 +1474,6 @@ def import_installations_techncien(request):
             return HttpResponse('aucun fichier na ete choisis')
     return render(request, 'app1/upload_installations_csv.html')
 
-
 @login_required
 def import_preparer_technicien(request):
     if request.method == "POST":
@@ -1529,7 +1497,6 @@ def import_preparer_technicien(request):
         else:
             return HttpResponse('aucun fichier na ete choisis')
     return render(request, 'app1/upload_preparation_csv.html')
-
 
 @login_required
 def import_mouvements(request):
@@ -1558,7 +1525,6 @@ def import_mouvements(request):
             return HttpResponse('aucun fichier na ete choisis')
     return render(request, 'app1/importer_mouvements.html')
 
-
 @login_required
 def liste_demandes_devis(request):
     # Récupérer les commandes en attente de devis
@@ -1577,7 +1543,6 @@ def liste_demandes_devis(request):
     }
 
     return render(request, "app1/liste_demandes_devis.html", context)
-
 
 @login_required
 def negocier_devis(request, id):
@@ -1630,7 +1595,6 @@ def envoyer_devis(request, id):
 
     return render(request, "app1/confirmer_envoi_devis.html", {"commande": commande})
 
-
 @login_required
 def devis_client(request):
     # Récupérer les devis reçus par le client
@@ -1640,7 +1604,6 @@ def devis_client(request):
     else:
         commandes = []
     return render(request, "app1/devis_client.html", {"commandes": commandes})
-
 
 @login_required
 def repondre_devis(request, id):

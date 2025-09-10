@@ -115,6 +115,7 @@
                 <p><strong>ID :</strong> {{ commande.id }}</p>
                 <p><strong>Date de la commande :</strong> {{ commande.date_commande }}</p>
                 <p><strong>Nom du client :</strong> {{ commande.client.nom }}</p>
+                <p><strong>Statut :</strong> {{ commande.statut }}</p>
             </div>
         {% endfor %}
     {% else %}
