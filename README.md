@@ -26,7 +26,7 @@ Order cancellation: the client can cancel the order at any time except when it h
 
 Intervention files: each system actor can upload/download a report file for their intervention. These files are visible to the administrator.
 
-Discount PDF generation: upon placing an order, the client can generate and download a discount PDF.
+PDF generation: upon placing an order, the client can generate and download a PDF.
 
 Data migration: integration with Pandas to migrate existing data from Excel files into the database.
 
