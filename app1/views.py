@@ -400,13 +400,12 @@ def liste_commande_assinger(request):
 def historique_commande_passe(request):
     commandes = Commande.objects.select_related("client").filter(
         comerciale_id=request.user.id,
-        statut__in=["valider","livrer","expediter","installer","preparation_terminer"],
+        statut__in=["valider","livrer","expediter","installer","preparation_terminer","finaliser"]
     )
     return render(request, "app1/historique_commande_comerciale.html", {"commandes": commandes})
 @login_required
 def dashboard_client(request):
     return render(request, "app1/dashboard_client.html")
-
 
 @login_required
 def consulter_notification_client(request):
@@ -1257,7 +1256,6 @@ def nombre_intervention_par_user(request):
     # Placeholder pour le nombre d'interventions par utilisateur
     return render(request, "app1/nombe_fiche_intervention_par_user.html", {"result": []})
 
-
 @login_required
 def temps_ecoule_avant_date_limiter(request):
     coursier = CustomUser.objects.get(id=request.user.id)
@@ -1283,7 +1281,6 @@ def temps_ecoule_avant_date_limiter(request):
             "temps_utilise_pourcent": round(pourcentage_utilise, 1) if pourcentage_utilise is not None else "N/A"
         })
     return render(request, "app1/templates/app1/temps_ecouler_coursier.html", {"commandes_infos": commandes_infos})
-
 
 @login_required
 def temps_ecoule_avant_date_limiter_commercial(request):
@@ -1423,7 +1420,6 @@ def import_commandes(request):
             return HttpResponse('aucun fichier na ete choisis')
     return render(request, 'app1/importer_csv_commandes.html')
 
-
 @login_required
 def import_couriser_commandes(request):
     if request.method == "POST":
@@ -1448,7 +1444,6 @@ def import_couriser_commandes(request):
         else:
             return HttpResponse('aucun fichier na ete choisis')
     return render(request, 'app1/upload_coursier_commande_csv.html')
-
 
 @login_required
 def import_installations_techncien(request):
